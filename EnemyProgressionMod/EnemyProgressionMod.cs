@@ -34,6 +34,9 @@ namespace EnemyProgressionMod
         private FieldInfo spawnDecksField;
         private bool reflectionReady;
 
+        // Tolerance for floating-point progression comparisons
+        private const float PROGRESSION_TOLERANCE = 0.001f;
+
         // Snapshot of original vanilla spawn card progression values (for restore/reference)
         private Dictionary<int, OriginalSpawnCardData> originalSpawnData;
 
@@ -245,12 +248,12 @@ namespace EnemyProgressionMod
                         float newMin = Mathf.Clamp(card.m_MinProgression, minProg, maxProg);
                         float newMax = Mathf.Clamp(card.m_MaxProgression, minProg, maxProg);
 
-                        // Ensure min <= max
-                        if (newMin > newMax)
-                            newMin = newMax;
+                        // Ensure min <= max with proper bounds
+                        newMin = Mathf.Min(newMin, newMax);
+                        newMax = Mathf.Max(newMin, newMax);
 
-                        if (Math.Abs(card.m_MinProgression - newMin) > 0.001f ||
-                            Math.Abs(card.m_MaxProgression - newMax) > 0.001f)
+                        if (Math.Abs(card.m_MinProgression - newMin) > PROGRESSION_TOLERANCE ||
+                            Math.Abs(card.m_MaxProgression - newMax) > PROGRESSION_TOLERANCE)
                         {
                             card.m_MinProgression = newMin;
                             card.m_MaxProgression = newMax;
@@ -297,7 +300,7 @@ namespace EnemyProgressionMod
                             foreach (SpawnCard card in kvp.Value)
                             {
                                 totalCards++;
-                                if (card.m_MinProgression >= minProg - 0.01f && card.m_MaxProgression <= maxProg + 0.01f)
+                                if (card.m_MinProgression >= minProg - PROGRESSION_TOLERANCE && card.m_MaxProgression <= maxProg + PROGRESSION_TOLERANCE)
                                     cardsInRange++;
                             }
                         }
