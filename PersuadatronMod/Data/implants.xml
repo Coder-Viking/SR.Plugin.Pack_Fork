@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ImplantDefinitions>
+  <!--
+    Implant definitions for the Persuadatron Mod.
+    4 augmentation groups with 3 tiers each (Mk1/Mk2/Mk3).
+    
+    SlotType values: 1=Head, 2=Body, 3=Arms, 4=Legs
+    Modifier Type values: 1=Add, 2=Multiply, 3=Replace
+    PersuadatronLevel: Only for Head implants (0=none, 1/2/3=level)
+  -->
+
+  <!-- === LEG IMPLANTS === -->
+  <!-- Increases sprint speed and duration -->
+  
+  <Implant>
+    <ItemID>90100</ItemID>
+    <Name>Cybernetic Legs Mk1</Name>
+    <SlotType>4</SlotType>
+    <Tier>1</Tier>
+    <Cost>500</Cost>
+    <ResearchCost>300</ResearchCost>
+    <Progression>0.1</Progression>
+    <PersuadatronLevel>0</PersuadatronLevel>
+    <Modifiers>
+      <Modifier Type="2" Amount="1.15" TimeOut="0" />
+    </Modifiers>
+  </Implant>
+  
+  <Implant>
+    <ItemID>90101</ItemID>
+    <Name>Cybernetic Legs Mk2</Name>
+    <SlotType>4</SlotType>
+    <Tier>2</Tier>
+    <Cost>1000</Cost>
+    <ResearchCost>600</ResearchCost>
+    <Progression>0.35</Progression>
+    <PersuadatronLevel>0</PersuadatronLevel>
+    <Modifiers>
+      <Modifier Type="2" Amount="1.30" TimeOut="0" />
+    </Modifiers>
+  </Implant>
+  
+  <Implant>
+    <ItemID>90102</ItemID>
+    <Name>Cybernetic Legs Mk3</Name>
+    <SlotType>4</SlotType>
+    <Tier>3</Tier>
+    <Cost>1500</Cost>
+    <ResearchCost>900</ResearchCost>
+    <Progression>0.6</Progression>
+    <PersuadatronLevel>0</PersuadatronLevel>
+    <Modifiers>
+      <Modifier Type="2" Amount="1.50" TimeOut="0" />
+    </Modifiers>
+  </Implant>
+
+  <!-- === ARM IMPLANTS === -->
+  <!-- Increases carry capacity and weapon accuracy -->
+  
+  <Implant>
+    <ItemID>90103</ItemID>
+    <Name>Cybernetic Arms Mk1</Name>
+    <SlotType>3</SlotType>
+    <Tier>1</Tier>
+    <Cost>600</Cost>
+    <ResearchCost>350</ResearchCost>
+    <Progression>0.1</Progression>
+    <PersuadatronLevel>0</PersuadatronLevel>
+    <Modifiers>
+      <Modifier Type="1" Amount="0.05" TimeOut="0" />
+      <Modifier Type="2" Amount="1.15" TimeOut="0" />
+    </Modifiers>
+  </Implant>
+  
+  <Implant>
+    <ItemID>90104</ItemID>
+    <Name>Cybernetic Arms Mk2</Name>
+    <SlotType>3</SlotType>
+    <Tier>2</Tier>
+    <Cost>1200</Cost>
+    <ResearchCost>700</ResearchCost>
+    <Progression>0.35</Progression>
+    <PersuadatronLevel>0</PersuadatronLevel>
+    <Modifiers>
+      <Modifier Type="1" Amount="0.10" TimeOut="0" />
+      <Modifier Type="2" Amount="1.30" TimeOut="0" />
+    </Modifiers>
+  </Implant>
+  
+  <Implant>
+    <ItemID>90105</ItemID>
+    <Name>Cybernetic Arms Mk3</Name>
+    <SlotType>3</SlotType>
+    <Tier>3</Tier>
+    <Cost>1800</Cost>
+    <ResearchCost>1050</ResearchCost>
+    <Progression>0.6</Progression>
+    <PersuadatronLevel>0</PersuadatronLevel>
+    <Modifiers>
+      <Modifier Type="1" Amount="0.18" TimeOut="0" />
+      <Modifier Type="2" Amount="1.50" TimeOut="0" />
+    </Modifiers>
+  </Implant>
+
+  <!-- === BODY IMPLANTS === -->
+  <!-- Increases HP, damage resistance, and HP regen (Mk3) -->
+  
+  <Implant>
+    <ItemID>90106</ItemID>
+    <Name>Cybernetic Torso Mk1</Name>
+    <SlotType>2</SlotType>
+    <Tier>1</Tier>
+    <Cost>700</Cost>
+    <ResearchCost>400</ResearchCost>
+    <Progression>0.15</Progression>
+    <PersuadatronLevel>0</PersuadatronLevel>
+    <Modifiers>
+      <Modifier Type="2" Amount="1.20" TimeOut="0" />
+      <Modifier Type="1" Amount="0.05" TimeOut="0" />
+    </Modifiers>
+  </Implant>
+  
+  <Implant>
+    <ItemID>90107</ItemID>
+    <Name>Cybernetic Torso Mk2</Name>
+    <SlotType>2</SlotType>
+    <Tier>2</Tier>
+    <Cost>1400</Cost>
+    <ResearchCost>800</ResearchCost>
+    <Progression>0.4</Progression>
+    <PersuadatronLevel>0</PersuadatronLevel>
+    <Modifiers>
+      <Modifier Type="2" Amount="1.40" TimeOut="0" />
+      <Modifier Type="1" Amount="0.15" TimeOut="0" />
+    </Modifiers>
+  </Implant>
+  
+  <Implant>
+    <ItemID>90108</ItemID>
+    <Name>Cybernetic Torso Mk3</Name>
+    <SlotType>2</SlotType>
+    <Tier>3</Tier>
+    <Cost>2100</Cost>
+    <ResearchCost>1200</ResearchCost>
+    <Progression>0.65</Progression>
+    <PersuadatronLevel>0</PersuadatronLevel>
+    <Modifiers>
+      <Modifier Type="2" Amount="1.60" TimeOut="0" />
+      <Modifier Type="1" Amount="0.25" TimeOut="0" />
+    </Modifiers>
+  </Implant>
+
+  <!-- === BRAIN IMPLANTS === -->
+  <!-- Unlocks Persuadatron levels and cognitive abilities -->
+  
+  <Implant>
+    <ItemID>90109</ItemID>
+    <Name>Neural Cortex Mk1</Name>
+    <SlotType>1</SlotType>
+    <Tier>1</Tier>
+    <Cost>800</Cost>
+    <ResearchCost>500</ResearchCost>
+    <Progression>0.1</Progression>
+    <PersuadatronLevel>1</PersuadatronLevel>
+    <Modifiers />
+    <Abilities />
+  </Implant>
+  
+  <Implant>
+    <ItemID>90110</ItemID>
+    <Name>Neural Cortex Mk2</Name>
+    <SlotType>1</SlotType>
+    <Tier>2</Tier>
+    <Cost>1600</Cost>
+    <ResearchCost>1000</ResearchCost>
+    <Progression>0.35</Progression>
+    <PersuadatronLevel>2</PersuadatronLevel>
+    <Modifiers />
+    <Abilities>
+      <AbilityID>1317</AbilityID>
+    </Abilities>
+  </Implant>
+  
+  <Implant>
+    <ItemID>90111</ItemID>
+    <Name>Neural Cortex Mk3</Name>
+    <SlotType>1</SlotType>
+    <Tier>3</Tier>
+    <Cost>2400</Cost>
+    <ResearchCost>1500</ResearchCost>
+    <Progression>0.6</Progression>
+    <PersuadatronLevel>3</PersuadatronLevel>
+    <Modifiers />
+    <Abilities>
+      <AbilityID>1317</AbilityID>
+      <AbilityID>1331</AbilityID>
+    </Abilities>
+  </Implant>
+</ImplantDefinitions>
