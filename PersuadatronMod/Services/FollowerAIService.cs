@@ -501,12 +501,25 @@ namespace PersuadatronMod.Services
                 if (factionField != null)
                 {
                     var faction = factionField.GetValue(entity);
-                    if (faction != null)
+                    if (faction != null && faction is int)
                     {
                         // The entity is hostile if its faction ID indicates enemy
                         // Faction 0 = player, Faction 1 = civilians, Faction 2+ = enemies
                         int factionID = (int)faction;
                         return factionID >= 2;
+                    }
+                    else if (faction != null)
+                    {
+                        // Faction may be an enum; try converting via underlying type
+                        try
+                        {
+                            int factionID = Convert.ToInt32(faction);
+                            return factionID >= 2;
+                        }
+                        catch
+                        {
+                            // Unable to determine faction
+                        }
                     }
                 }
 
