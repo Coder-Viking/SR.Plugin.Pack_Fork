@@ -335,7 +335,7 @@ namespace PersuadatronMod
                 Vector3 carrierPos = carrier.transform.position;
 
                 // Find targets in range
-                List<GameEntity> targets = persuasionService.FindTargetsInRange(carrierPos, persuadatronLevel);
+                List<AIEntity> targets = persuasionService.FindTargetsInRange(carrierPos, persuadatronLevel);
 
                 if (targets.Count == 0)
                 {
@@ -345,7 +345,7 @@ namespace PersuadatronMod
                 }
 
                 // Persuade the nearest target
-                GameEntity nearest = null;
+                AIEntity nearest = null;
                 float nearestDist = float.MaxValue;
                 foreach (var target in targets)
                 {
@@ -388,7 +388,7 @@ namespace PersuadatronMod
         /// <summary>
         /// Checks if a target is already in the follower list.
         /// </summary>
-        private bool IsAlreadyPersuaded(GameEntity target)
+        private bool IsAlreadyPersuaded(AIEntity target)
         {
             foreach (var follower in followerAIService.GetFollowers())
             {
