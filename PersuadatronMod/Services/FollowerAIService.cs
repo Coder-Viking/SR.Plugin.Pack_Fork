@@ -89,11 +89,45 @@ namespace PersuadatronMod.Services
         }
 
         /// <summary>
+        /// Gets the number of followers owned by a specific agent.
+        /// </summary>
+        public int GetFollowerCountForAgent(AgentAI agent)
+        {
+            if (agent == null)
+                return 0;
+
+            int count = 0;
+            foreach (var follower in followers)
+            {
+                if (follower.OwnerAgent != null && follower.OwnerAgent == agent)
+                    count++;
+            }
+            return count;
+        }
+
+        /// <summary>
         /// Gets the list of current followers (read-only copy).
         /// </summary>
         public List<PersuadedUnit> GetFollowers()
         {
             return new List<PersuadedUnit>(followers);
+        }
+
+        /// <summary>
+        /// Gets the list of followers owned by a specific agent (read-only copy).
+        /// </summary>
+        public List<PersuadedUnit> GetFollowersForAgent(AgentAI agent)
+        {
+            var result = new List<PersuadedUnit>();
+            if (agent == null)
+                return result;
+
+            foreach (var follower in followers)
+            {
+                if (follower.OwnerAgent != null && follower.OwnerAgent == agent)
+                    result.Add(follower);
+            }
+            return result;
         }
 
         /// <summary>
@@ -217,6 +251,23 @@ namespace PersuadatronMod.Services
         }
 
         /// <summary>
+        /// Removes dead or expired followers from the list, releasing hijack control.
+        /// Should be called once per update cycle before per-agent updates.
+        /// </summary>
+        public void CleanupExpiredFollowers()
+        {
+            for (int i = followers.Count - 1; i >= 0; i--)
+            {
+                if (followers[i].ShouldRemove)
+                {
+                    UnhijackUnit(followers[i]);
+                    Debug.Log("PersuadatronMod: Removing follower (dead/expired). Remaining: " + (followers.Count - 1));
+                    followers.RemoveAt(i);
+                }
+            }
+        }
+
+        /// <summary>
         /// Main update loop for follower AI. Call from the mod's Update() method.
         /// With the Hijack system active, the game handles most AI behavior.
         /// This update loop handles cleanup, weapon pickup, and leash distance.
@@ -229,14 +280,20 @@ namespace PersuadatronMod.Services
             lastUpdateTime = Time.time;
 
             // Clean up dead/expired followers (unhijacks them)
-            CleanupFollowers();
+            CleanupExpiredFollowers();
 
             // Update each follower's supplementary behavior
             for (int i = 0; i < followers.Count; i++)
             {
                 try
                 {
-                    UpdateFollowerBehavior(followers[i], carrierPosition);
+                    // Use owner agent's position if available, otherwise fallback
+                    Vector3 followPos = carrierPosition;
+                    if (followers[i].OwnerAgent != null && followers[i].OwnerAgent.transform != null)
+                    {
+                        followPos = followers[i].OwnerAgent.transform.position;
+                    }
+                    UpdateFollowerBehavior(followers[i], followPos);
                 }
                 catch (Exception e)
                 {
@@ -246,17 +303,46 @@ namespace PersuadatronMod.Services
         }
 
         /// <summary>
-        /// Removes dead or expired followers from the list, releasing hijack control.
+        /// Updates only the followers owned by a specific agent.
+        /// Each follower follows their owner agent rather than a global carrier.
+        /// Caller should call CleanupExpiredFollowers() once before calling this per-agent.
         /// </summary>
-        private void CleanupFollowers()
+        public void UpdateFollowersForAgent(AgentAI agent, Vector3 agentPosition)
         {
-            for (int i = followers.Count - 1; i >= 0; i--)
+            for (int i = 0; i < followers.Count; i++)
             {
-                if (followers[i].ShouldRemove)
+                try
                 {
-                    UnhijackUnit(followers[i]);
-                    Debug.Log("PersuadatronMod: Removing follower (dead/expired). Remaining: " + (followers.Count - 1));
-                    followers.RemoveAt(i);
+                    if (followers[i].OwnerAgent == agent)
+                    {
+                        UpdateFollowerBehavior(followers[i], agentPosition);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("PersuadatronMod: Follower AI error for unit " + i + ": " + e.Message);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Updates followers whose owner agent is null or no longer valid.
+        /// These "orphaned" followers fall back to following the given position.
+        /// </summary>
+        public void UpdateOrphanedFollowers(Vector3 fallbackPosition)
+        {
+            for (int i = 0; i < followers.Count; i++)
+            {
+                try
+                {
+                    if (followers[i].OwnerAgent == null)
+                    {
+                        UpdateFollowerBehavior(followers[i], fallbackPosition);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("PersuadatronMod: Orphaned follower AI error for unit " + i + ": " + e.Message);
                 }
             }
         }

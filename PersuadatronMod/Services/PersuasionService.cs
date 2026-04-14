@@ -80,6 +80,15 @@ namespace PersuadatronMod.Services
         }
 
         /// <summary>
+        /// Gets the Persuadatron level for a specific agent based on their equipped brain implant.
+        /// Returns 0 if the agent has no brain implant equipped.
+        /// </summary>
+        public int GetPersuadatronLevelForAgent(AgentAI agent)
+        {
+            return implantService.GetBrainImplantLevelForAgent(agent);
+        }
+
+        /// <summary>
         /// Checks whether a given entity is a valid persuasion target based on
         /// the current brain implant level and target properties.
         /// </summary>

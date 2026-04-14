@@ -309,63 +309,80 @@ namespace PersuadatronMod
         /// <summary>
         /// Automatic persuasion aura: while the Persuadatron weapon is equipped,
         /// nearby valid targets are automatically persuaded at regular intervals.
-        /// Persuasion level and follower cap depend on the equipped Neural Cortex implant.
+        /// Each agent with a Persuadatron has their own independent follower pool.
+        /// Persuasion level and follower cap depend on each agent's equipped Neural Cortex implant.
         /// </summary>
         private void UpdatePersuasionAura()
         {
             try
             {
-                int persuadatronLevel = persuasionService.GetCurrentPersuadatronLevel();
-                if (persuadatronLevel <= 0)
-                    return;
-
-                // Check if any agent has the Persuadatron weapon equipped
-                AgentAI carrier = GetPersuadatronCarrier();
-                if (carrier == null)
-                    return;
-
-                // Check cooldown
+                // Check cooldown (shared across all agents)
                 if (!persuasionService.IsReady)
                     return;
 
-                // Get max followers for current implant level
-                int maxFollowers = GetMaxFollowersForLevel(persuadatronLevel);
-                if (followerAIService.FollowerCount >= maxFollowers)
-                    return;
-
-                Vector3 carrierPos = carrier.transform.position;
-
-                // Find targets in aura range
-                List<AIEntity> targets = persuasionService.FindTargetsInRange(
-                    carrierPos, persuadatronLevel, config.PersuasionAuraRange);
-
-                // Auto-persuade the nearest valid target
-                AIEntity nearest = null;
-                float nearestDist = float.MaxValue;
-                foreach (var target in targets)
+                // Iterate over all agents to find each Persuadatron carrier
+                foreach (AgentAI agent in AgentAI.GetAgents())
                 {
-                    if (IsAlreadyPersuaded(target))
+                    if (agent == null)
                         continue;
 
-                    float dist = Vector3.Distance(carrierPos, target.transform.position);
-                    if (dist < nearestDist)
+                    var items = agent.GetItems();
+                    if (items == null)
+                        continue;
+
+                    // Check if this agent has the Persuadatron weapon equipped
+                    if (!items.HasEquipped(persuadatronID))
+                        continue;
+
+                    // Get this agent's brain implant level
+                    int persuadatronLevel = persuasionService.GetPersuadatronLevelForAgent(agent);
+                    if (persuadatronLevel <= 0)
+                        continue;
+
+                    // Get max followers for this agent's implant level
+                    int maxFollowers = GetMaxFollowersForLevel(persuadatronLevel);
+                    int agentFollowerCount = followerAIService.GetFollowerCountForAgent(agent);
+                    if (agentFollowerCount >= maxFollowers)
+                        continue;
+
+                    Vector3 carrierPos = agent.transform.position;
+
+                    // Find targets in aura range around this agent
+                    List<AIEntity> targets = persuasionService.FindTargetsInRange(
+                        carrierPos, persuadatronLevel, config.PersuasionAuraRange);
+
+                    // Auto-persuade the nearest valid target for this agent
+                    AIEntity nearest = null;
+                    float nearestDist = float.MaxValue;
+                    foreach (var target in targets)
                     {
-                        nearestDist = dist;
-                        nearest = target;
+                        if (IsAlreadyPersuaded(target))
+                            continue;
+
+                        float dist = Vector3.Distance(carrierPos, target.transform.position);
+                        if (dist < nearestDist)
+                        {
+                            nearestDist = dist;
+                            nearest = target;
+                        }
                     }
-                }
 
-                if (nearest != null)
-                {
-                    PersuadedUnit unit = persuasionService.TryPersuade(
-                        nearest, persuadatronLevel, followerAIService.FollowerCount, maxFollowers);
-
-                    if (unit != null)
+                    if (nearest != null)
                     {
-                        followerAIService.AddFollower(unit);
-                        Manager.GetUIManager().ShowSubtitle(
-                            "Persuadatron: Target persuaded! Followers: " +
-                            followerAIService.FollowerCount + "/" + maxFollowers, 3);
+                        PersuadedUnit unit = persuasionService.TryPersuade(
+                            nearest, persuadatronLevel, agentFollowerCount, maxFollowers);
+
+                        if (unit != null)
+                        {
+                            unit.OwnerAgent = agent;
+                            followerAIService.AddFollower(unit);
+
+                            int newCount = followerAIService.GetFollowerCountForAgent(agent);
+                            Manager.GetUIManager().ShowSubtitle(
+                                "Persuadatron: Target persuaded! " +
+                                agent.name + "'s Followers: " +
+                                newCount + "/" + maxFollowers, 3);
+                        }
                     }
                 }
             }
@@ -376,8 +393,8 @@ namespace PersuadatronMod
         }
 
         /// <summary>
-        /// Finds the player agent that currently has the Persuadatron weapon equipped
-        /// in a weapon slot (WeaponPistol).
+        /// Finds the first player agent that currently has the Persuadatron weapon equipped.
+        /// Used for status display purposes.
         /// </summary>
         private AgentAI GetPersuadatronCarrier()
         {
@@ -447,23 +464,36 @@ namespace PersuadatronMod
 
             try
             {
-                // Get the carrier's position (first selected agent or first agent)
-                AgentAI carrier = AgentAI.FirstSelectedAgentAi();
-                if (carrier == null)
+                // Clean up dead/expired followers once per update cycle
+                followerAIService.CleanupExpiredFollowers();
+
+                // Update followers per-agent: each follower follows its owner agent
+                foreach (AgentAI agent in AgentAI.GetAgents())
+                {
+                    if (agent == null)
+                        continue;
+
+                    followerAIService.UpdateFollowersForAgent(agent, agent.transform.position);
+                }
+
+                // Also update any followers whose owner is no longer valid
+                // (fallback: follow first selected agent)
+                AgentAI fallbackCarrier = AgentAI.FirstSelectedAgentAi();
+                if (fallbackCarrier == null)
                 {
                     foreach (AgentAI agent in AgentAI.GetAgents())
                     {
                         if (agent != null)
                         {
-                            carrier = agent;
+                            fallbackCarrier = agent;
                             break;
                         }
                     }
                 }
 
-                if (carrier != null)
+                if (fallbackCarrier != null)
                 {
-                    followerAIService.UpdateFollowers(carrier.transform.position);
+                    followerAIService.UpdateOrphanedFollowers(fallbackCarrier.transform.position);
                 }
             }
             catch (Exception e)
@@ -512,24 +542,53 @@ namespace PersuadatronMod
         {
             try
             {
-                int brainLevel = persuasionService.GetCurrentPersuadatronLevel();
-                string brainStatus = brainLevel > 0
-                    ? "Neural Cortex Mk" + brainLevel
-                    : "None equipped";
-
-                bool persuadatronEquipped = GetPersuadatronCarrier() != null;
-                string persuadatronStatus = persuadatronEquipped
-                    ? "EQUIPPED (Aura Active)"
-                    : "Not equipped";
-
                 string cooldownStatus = persuasionService.IsReady
                     ? "READY"
                     : persuasionService.CooldownRemaining.ToString("F1") + "s";
 
-                int maxFollowers = GetMaxFollowersForLevel(brainLevel);
+                // Build per-agent status
+                string agentInfo = "";
+                int totalFollowers = followerAIService.FollowerCount;
+                int totalMax = 0;
+                int carrierCount = 0;
 
+                foreach (AgentAI agent in AgentAI.GetAgents())
+                {
+                    if (agent == null)
+                        continue;
+
+                    var items = agent.GetItems();
+                    if (items == null)
+                        continue;
+
+                    bool hasPersuadatron = items.HasEquipped(persuadatronID);
+                    int brainLevel = persuasionService.GetPersuadatronLevelForAgent(agent);
+
+                    if (hasPersuadatron && brainLevel > 0)
+                    {
+                        carrierCount++;
+                        int agentMax = GetMaxFollowersForLevel(brainLevel);
+                        int agentCount = followerAIService.GetFollowerCountForAgent(agent);
+                        totalMax += agentMax;
+
+                        agentInfo += "  " + agent.name + ": Mk" + brainLevel +
+                            " | Followers: " + agentCount + "/" + agentMax + "\n";
+                    }
+                    else if (hasPersuadatron)
+                    {
+                        agentInfo += "  " + agent.name + ": Persuadatron equipped but no Neural Cortex\n";
+                    }
+                }
+
+                if (carrierCount == 0)
+                {
+                    agentInfo = "  No agents have Persuadatron + Neural Cortex equipped\n";
+                }
+
+                // Determine valid targets from highest brain level
+                int highestBrainLevel = persuasionService.GetCurrentPersuadatronLevel();
                 string targetInfo = "";
-                switch (brainLevel)
+                switch (highestBrainLevel)
                 {
                     case 1:
                         targetInfo = "Civilians only";
@@ -549,11 +608,11 @@ namespace PersuadatronMod
 
                 string status =
                     "=== Persuadatron Mod Status ===\n\n" +
-                    "Brain Implant: " + brainStatus + "\n" +
-                    "Persuadatron: " + persuadatronStatus + "\n" +
+                    "Active Carriers: " + carrierCount + "\n" +
+                    agentInfo +
                     "Cooldown: " + cooldownStatus + "\n" +
                     "Valid Targets: " + targetInfo + "\n" +
-                    "Followers: " + followerAIService.FollowerCount + "/" + maxFollowers + "\n" +
+                    "Total Followers: " + totalFollowers + "/" + totalMax + "\n" +
                     "Aura Range: " + config.PersuasionAuraRange + " units\n\n" +
                     "Enemy weapon drops: Active\n" +
                     "Implants Registered: " + implantService.GetImplantDefinitions().Count + "\n\n" +
@@ -572,8 +631,6 @@ namespace PersuadatronMod
             try
             {
                 var followers = followerAIService.GetFollowers();
-                int brainLevel = persuasionService.GetCurrentPersuadatronLevel();
-                int maxFollowers = GetMaxFollowersForLevel(brainLevel);
 
                 if (followers.Count == 0)
                 {
@@ -581,22 +638,48 @@ namespace PersuadatronMod
                     return;
                 }
 
-                string info = "=== Persuaded Followers (" + followers.Count + "/" + maxFollowers + ") ===\n\n";
+                string info = "=== Persuaded Followers (Total: " + followers.Count + ") ===\n\n";
 
-                for (int i = 0; i < followers.Count; i++)
+                // Group followers by owner agent
+                var ownerGroups = new Dictionary<string, List<PersuadedUnit>>();
+                foreach (var f in followers)
                 {
-                    var f = followers[i];
-                    string state = "Following";
-                    if (f.IsInCombat) state = "COMBAT";
-                    else if (f.IsPickingUpWeapon) state = "Picking up weapon";
+                    string ownerName = f.OwnerAgent != null ? f.OwnerAgent.name : "Unknown";
+                    if (!ownerGroups.ContainsKey(ownerName))
+                        ownerGroups[ownerName] = new List<PersuadedUnit>();
+                    ownerGroups[ownerName].Add(f);
+                }
 
-                    string weaponStatus = f.HasWeapon ? "Armed" : "Unarmed";
-                    string timeLeft = f.Duration > 0
-                        ? ((f.PersuadedAtTime + f.Duration - Time.time).ToString("F0") + "s left")
-                        : "Permanent";
+                foreach (var kvp in ownerGroups)
+                {
+                    string ownerName = kvp.Key;
+                    var group = kvp.Value;
 
-                    info += (i + 1) + ". [" + state + "] " + weaponStatus +
-                        " | PwrLvl: " + (f.PowerLevel * 100f).ToString("F0") + "% | " + timeLeft + "\n";
+                    // Get max for this owner
+                    int ownerMax = 0;
+                    if (group.Count > 0 && group[0].OwnerAgent != null)
+                    {
+                        int brainLevel = persuasionService.GetPersuadatronLevelForAgent(group[0].OwnerAgent);
+                        ownerMax = GetMaxFollowersForLevel(brainLevel);
+                    }
+
+                    info += "--- " + ownerName + " (" + group.Count + "/" + ownerMax + ") ---\n";
+
+                    for (int i = 0; i < group.Count; i++)
+                    {
+                        var f = group[i];
+                        string state = "Following";
+                        if (f.IsInCombat) state = "COMBAT";
+                        else if (f.IsPickingUpWeapon) state = "Picking up weapon";
+
+                        string weaponStatus = f.HasWeapon ? "Armed" : "Unarmed";
+                        string timeLeft = f.Duration > 0
+                            ? ((f.PersuadedAtTime + f.Duration - Time.time).ToString("F0") + "s left")
+                            : "Permanent";
+
+                        info += "  " + (i + 1) + ". [" + state + "] " + weaponStatus +
+                            " | PwrLvl: " + (f.PowerLevel * 100f).ToString("F0") + "% | " + timeLeft + "\n";
+                    }
                 }
 
                 Manager.GetUIManager().ShowMessagePopup(info, 10);

@@ -58,34 +58,55 @@ namespace PersuadatronMod.Services
 
         /// <summary>
         /// Gets the Persuadatron level from the currently equipped brain implant.
+        /// Returns the highest level found across all agents.
         /// Returns 0 if no brain implant is equipped.
         /// </summary>
         public int GetEquippedBrainImplantLevel()
         {
+            int maxLevel = 0;
             try
             {
                 // Check each player agent for equipped brain implant
                 foreach (AgentAI agent in AgentAI.GetAgents())
                 {
-                    if (agent == null || agent.GetItems() == null)
-                        continue;
-
-                    // Check if agent has any of our brain implant items equipped
-                    foreach (var implant in implantDefinitions)
-                    {
-                        if (implant.SlotType != 1) // 1 = Head
-                            continue;
-
-                        if (agent.GetItems().HasEquipped(implant.ItemID))
-                        {
-                            return implant.PersuadatronLevel;
-                        }
-                    }
+                    int level = GetBrainImplantLevelForAgent(agent);
+                    if (level > maxLevel)
+                        maxLevel = level;
                 }
             }
             catch (Exception e)
             {
                 Debug.LogError("PersuadatronMod: Error checking brain implant: " + e.Message);
+            }
+            return maxLevel;
+        }
+
+        /// <summary>
+        /// Gets the Persuadatron level from a specific agent's equipped brain implant.
+        /// Returns 0 if the agent has no brain implant equipped.
+        /// </summary>
+        public int GetBrainImplantLevelForAgent(AgentAI agent)
+        {
+            try
+            {
+                if (agent == null || agent.GetItems() == null)
+                    return 0;
+
+                // Check if agent has any of our brain implant items equipped
+                foreach (var implant in implantDefinitions)
+                {
+                    if (implant.SlotType != 1) // 1 = Head
+                        continue;
+
+                    if (agent.GetItems().HasEquipped(implant.ItemID))
+                    {
+                        return implant.PersuadatronLevel;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("PersuadatronMod: Error checking brain implant for agent: " + e.Message);
             }
             return 0;
         }
