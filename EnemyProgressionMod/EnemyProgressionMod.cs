@@ -321,9 +321,10 @@ namespace EnemyProgressionMod
                 string status =
                     "=== Enemy Progression Mod ===\n\n" +
                     "Status: " + (config.Enabled ? "ACTIVE" : "DISABLED") + "\n" +
-                    "Reflection Ready: " + (reflectionReady ? "YES" : "NO - spawn overrides will not work!") + "\n" +
-                    "Current District: " + districtName + " (Index " + districtIndex + ")\n" +
-                    "Enemy Level Range: " + (minProg * 100f).ToString("F0") + "% - " + (maxProg * 100f).ToString("F0") + "%\n\n" +
+                    "Reflection Ready: " + (reflectionReady ? "YES" : "NO - spawn overrides will not work!") + "\n\n" +
+                    "--- Schwierigkeitsgrad / Difficulty ---\n" +
+                    "Aktueller Distrikt: " + districtName + " (Index " + districtIndex + ")\n" +
+                    "Gegner-Level: " + (minProg * 100f).ToString("F0") + "% - " + (maxProg * 100f).ToString("F0") + "%\n\n" +
                     "Enemy Definitions: " + totalEnemyDefs + "\n" +
                     "Spawn Cards: " + totalCards + " total, " + cardsInRange + " in current range\n" +
                     "Original Data Cached: " + originalSpawnData.Count + " entries\n\n" +
