@@ -35,9 +35,12 @@ namespace PersuadatronMod.Config
         public float PersuasionDuration = 0f;
 
         /// <summary>
-        /// Maximum number of simultaneously persuaded followers per Neural Cortex level.
+        /// Maximum number of simultaneously persuaded followers per agent per Neural Cortex level.
+        /// Each agent with a Persuadatron has their own independent pool.
         /// Index 0 = Mk1, Index 1 = Mk2, Index 2 = Mk3.
         /// If the implant level exceeds the list length, the last value is used.
+        /// Example: With Mk1 (cap=2) and 4 agents each having a Persuadatron,
+        /// the total team capacity is 4 × 2 = 8 followers.
         /// </summary>
         [XmlArray("MaxFollowersPerLevel")]
         [XmlArrayItem("Level")]

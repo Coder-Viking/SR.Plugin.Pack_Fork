@@ -89,11 +89,45 @@ namespace PersuadatronMod.Services
         }
 
         /// <summary>
+        /// Gets the number of followers owned by a specific agent.
+        /// </summary>
+        public int GetFollowerCountForAgent(AgentAI agent)
+        {
+            if (agent == null)
+                return 0;
+
+            int count = 0;
+            foreach (var follower in followers)
+            {
+                if (follower.OwnerAgent != null && follower.OwnerAgent == agent)
+                    count++;
+            }
+            return count;
+        }
+
+        /// <summary>
         /// Gets the list of current followers (read-only copy).
         /// </summary>
         public List<PersuadedUnit> GetFollowers()
         {
             return new List<PersuadedUnit>(followers);
+        }
+
+        /// <summary>
+        /// Gets the list of followers owned by a specific agent (read-only copy).
+        /// </summary>
+        public List<PersuadedUnit> GetFollowersForAgent(AgentAI agent)
+        {
+            var result = new List<PersuadedUnit>();
+            if (agent == null)
+                return result;
+
+            foreach (var follower in followers)
+            {
+                if (follower.OwnerAgent != null && follower.OwnerAgent == agent)
+                    result.Add(follower);
+            }
+            return result;
         }
 
         /// <summary>
@@ -236,11 +270,69 @@ namespace PersuadatronMod.Services
             {
                 try
                 {
-                    UpdateFollowerBehavior(followers[i], carrierPosition);
+                    // Use owner agent's position if available, otherwise fallback
+                    Vector3 followPos = carrierPosition;
+                    if (followers[i].OwnerAgent != null && followers[i].OwnerAgent.transform != null)
+                    {
+                        followPos = followers[i].OwnerAgent.transform.position;
+                    }
+                    UpdateFollowerBehavior(followers[i], followPos);
                 }
                 catch (Exception e)
                 {
                     Debug.LogError("PersuadatronMod: Follower AI error for unit " + i + ": " + e.Message);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Updates only the followers owned by a specific agent.
+        /// Each follower follows their owner agent rather than a global carrier.
+        /// </summary>
+        public void UpdateFollowersForAgent(AgentAI agent, Vector3 agentPosition)
+        {
+            if (Time.time < lastUpdateTime + config.FollowerUpdateInterval)
+                return;
+
+            // Clean up dead/expired followers (unhijacks them)
+            CleanupFollowers();
+
+            for (int i = 0; i < followers.Count; i++)
+            {
+                try
+                {
+                    if (followers[i].OwnerAgent == agent)
+                    {
+                        UpdateFollowerBehavior(followers[i], agentPosition);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("PersuadatronMod: Follower AI error for unit " + i + ": " + e.Message);
+                }
+            }
+
+            lastUpdateTime = Time.time;
+        }
+
+        /// <summary>
+        /// Updates followers whose owner agent is null or no longer valid.
+        /// These "orphaned" followers fall back to following the given position.
+        /// </summary>
+        public void UpdateOrphanedFollowers(Vector3 fallbackPosition)
+        {
+            for (int i = 0; i < followers.Count; i++)
+            {
+                try
+                {
+                    if (followers[i].OwnerAgent == null)
+                    {
+                        UpdateFollowerBehavior(followers[i], fallbackPosition);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("PersuadatronMod: Orphaned follower AI error for unit " + i + ": " + e.Message);
                 }
             }
         }

@@ -14,6 +14,12 @@ namespace PersuadatronMod.Models
         public AIEntity Entity { get; set; }
 
         /// <summary>
+        /// The player agent whose Persuadatron persuaded this unit.
+        /// Used to track per-agent follower pools.
+        /// </summary>
+        public AgentAI OwnerAgent { get; set; }
+
+        /// <summary>
         /// The transform of the persuaded unit for position tracking.
         /// </summary>
         public Transform Transform
