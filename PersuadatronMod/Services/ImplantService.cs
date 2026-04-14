@@ -277,6 +277,9 @@ namespace PersuadatronMod.Services
                 foreach (var implant in implantDefinitions)
                 {
                     ItemManager.ItemData itemData = new ItemManager.ItemData();
+                    // CRITICAL: Initialize m_ResearchDataPoints to prevent NullReferenceException on save.
+                    // The game's SaveItemData constructor calls .ToArray() on this field.
+                    itemData.m_ResearchDataPoints = new List<ResearchDataPoint>();
                     itemData.m_ID = implant.ItemID;
                     itemData.m_FriendlyName = implant.Name;
                     itemData.m_Slot = GetSlotType(implant.SlotType);
