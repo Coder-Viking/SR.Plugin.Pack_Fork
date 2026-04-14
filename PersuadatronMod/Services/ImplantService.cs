@@ -102,7 +102,8 @@ namespace PersuadatronMod.Services
                     if (agent == null || agent.m_Health == null)
                         continue;
 
-                    int bodyTier = GetEquippedImplantTier(agent, 2); // 2 = Body                    if (bodyTier <= 0)
+                    int bodyTier = GetEquippedImplantTier(agent, 2); // 2 = Body
+                    if (bodyTier <= 0)
                         continue;
 
                     // Get regen rate for this tier
