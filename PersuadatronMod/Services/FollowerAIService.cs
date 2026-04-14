@@ -144,7 +144,7 @@ namespace PersuadatronMod.Services
                 entity.m_IsControllable = true;
                 entity.Hijack(AgentAI.GetAgent(AgentAI.AgentClass.Soldier), true);
 
-                // Visual feedback: magenta xray color for persuaded units
+                // Visual feedback: cyan xray color for persuaded units
                 try
                 {
                     entity.m_Wardrobe.SetXrayColor(Color.cyan);
