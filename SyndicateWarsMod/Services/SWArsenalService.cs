@@ -57,22 +57,22 @@ namespace SyndicateWarsMod.Services
 
                 // 1. Long Range Rifle (Sniper)
                 RegisterWeaponItem(itemManager, nextID++, "Long Range Rifle",
-                    ItemSlotTypes.Weapon, WeaponType.SniperRifle,
+                    ItemSlotTypes.Weapon, (WeaponType)3,
                     2500f, 1800f, 0.4f, -0.3f);
 
                 // 2. Razor Wire (Area denial)
                 RegisterWeaponItem(itemManager, nextID++, "Razor Wire",
-                    ItemSlotTypes.Weapon, WeaponType.HeavyWeapon,
+                    ItemSlotTypes.Weapon, (WeaponType)4,
                     600f, 300f, 0.15f, 0.1f);
 
                 // 3. Pulse Laser (Precise beam)
                 RegisterWeaponItem(itemManager, nextID++, "Pulse Laser",
-                    ItemSlotTypes.Weapon, WeaponType.AssaultRifle,
+                    ItemSlotTypes.Weapon, (WeaponType)2,
                     1800f, 1200f, 0.35f, 0.2f);
 
                 // 4. Graviton Gun (Heavy AOE + knockback)
                 RegisterWeaponItem(itemManager, nextID++, "Graviton Gun",
-                    ItemSlotTypes.Weapon, WeaponType.HeavyWeapon,
+                    ItemSlotTypes.Weapon, (WeaponType)4,
                     3500f, 2500f, 0.55f, 0.7f);
 
                 // 5. Satellite Rain (Orbital strike marker - Gear item)
@@ -81,7 +81,7 @@ namespace SyndicateWarsMod.Services
 
                 // 6. Nuclear Grenade
                 RegisterWeaponItem(itemManager, nextID++, "Nuclear Grenade",
-                    ItemSlotTypes.Weapon, WeaponType.Grenade,
+                    ItemSlotTypes.Weapon, (WeaponType)5,
                     4000f, 3000f, 0.65f, 0.9f);
 
                 isRegistered = true;
@@ -133,7 +133,7 @@ namespace SyndicateWarsMod.Services
             itemData.m_ID = id;
             itemData.m_FriendlyName = name;
             itemData.m_Slot = ItemSlotTypes.Gear;
-            itemData.m_GearSubCategory = ItemSubCategories.Gear;
+            itemData.m_GearSubCategory = ItemSubCategories.Standard;
             itemData.m_WeaponType = WeaponType.None;
             itemData.m_Cost = cost;
             itemData.m_ResearchCost = researchCost;
@@ -156,15 +156,7 @@ namespace SyndicateWarsMod.Services
         /// </summary>
         private ItemSubCategories GetSubCategoryForWeaponType(WeaponType wt)
         {
-            switch (wt)
-            {
-                case WeaponType.Pistol: return ItemSubCategories.Pistol;
-                case WeaponType.AssaultRifle: return ItemSubCategories.AssaultRifle;
-                case WeaponType.SniperRifle: return ItemSubCategories.SniperRifle;
-                case WeaponType.HeavyWeapon: return ItemSubCategories.HeavyWeapon;
-                case WeaponType.Grenade: return ItemSubCategories.Grenade;
-                default: return ItemSubCategories.None;
-            }
+            return ItemSubCategories.Standard;
         }
 
         /// <summary>
