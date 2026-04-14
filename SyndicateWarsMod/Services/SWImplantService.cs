@@ -71,7 +71,7 @@ namespace SyndicateWarsMod.Services
                         {
                             m_Type = (ModifierType)1, // Add
                             m_Ammount = accuracyBonus,
-                            m_AmountModifier = ModifierType.None,
+                            m_AmountModifier = ModifierType.NONE,
                             m_TimeOut = 0f
                         });
                     }
@@ -82,7 +82,7 @@ namespace SyndicateWarsMod.Services
                         {
                             m_Type = (ModifierType)2, // Multiply
                             m_Ammount = rangeMult,
-                            m_AmountModifier = ModifierType.None,
+                            m_AmountModifier = ModifierType.NONE,
                             m_TimeOut = 0f
                         });
                     }
@@ -112,7 +112,7 @@ namespace SyndicateWarsMod.Services
                     {
                         m_Type = (ModifierType)2, // Multiply
                         m_Ammount = hpMult,
-                        m_AmountModifier = ModifierType.None,
+                        m_AmountModifier = ModifierType.NONE,
                         m_TimeOut = 0f
                     });
                     // Damage resistance (Add)
@@ -122,7 +122,7 @@ namespace SyndicateWarsMod.Services
                         {
                             m_Type = (ModifierType)1, // Add
                             m_Ammount = resistBonus,
-                            m_AmountModifier = ModifierType.None,
+                            m_AmountModifier = ModifierType.NONE,
                             m_TimeOut = 0f
                         });
                     }
@@ -150,7 +150,7 @@ namespace SyndicateWarsMod.Services
                         {
                             m_Type = (ModifierType)1, // Add
                             m_Ammount = accuracyBonus,
-                            m_AmountModifier = ModifierType.None,
+                            m_AmountModifier = ModifierType.NONE,
                             m_TimeOut = 0f
                         });
                     }
@@ -159,7 +159,7 @@ namespace SyndicateWarsMod.Services
                     {
                         m_Type = (ModifierType)2, // Multiply
                         m_Ammount = carryMult,
-                        m_AmountModifier = ModifierType.None,
+                        m_AmountModifier = ModifierType.NONE,
                         m_TimeOut = 0f
                     });
 
@@ -183,7 +183,7 @@ namespace SyndicateWarsMod.Services
                     {
                         m_Type = (ModifierType)2, // Multiply
                         m_Ammount = sprintMult,
-                        m_AmountModifier = ModifierType.None,
+                        m_AmountModifier = ModifierType.NONE,
                         m_TimeOut = 0f
                     });
 
@@ -232,7 +232,7 @@ namespace SyndicateWarsMod.Services
                         if (currentHP < maxHP && currentHP > 0f)
                         {
                             float newHP = Mathf.Min(currentHP + hpRegen * deltaTime, maxHP);
-                            agent.m_Health.SetHealthValue(newHP);
+                            agent.SetHealthValue(newHP);
                         }
                     }
 
@@ -334,7 +334,7 @@ namespace SyndicateWarsMod.Services
             itemData.m_ID = id;
             itemData.m_FriendlyName = name;
             itemData.m_Slot = slotType;
-            itemData.m_GearSubCategory = ItemSubCategories.Augmentation;
+            itemData.m_GearSubCategory = ItemSubCategories.Standard;
             itemData.m_WeaponType = WeaponType.None;
             itemData.m_Cost = cost;
             itemData.m_ResearchCost = researchCost;

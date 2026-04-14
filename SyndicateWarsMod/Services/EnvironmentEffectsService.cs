@@ -220,7 +220,7 @@ namespace SyndicateWarsMod.Services
                             float damage = config.SatelliteRainDamage * Mathf.Max(falloff, 0.2f);
 
                             float newHP = Mathf.Max(0f, entity.m_Health.HealthValue - damage);
-                            entity.m_Health.SetHealthValue(newHP);
+                            entity.SetHealthValue(newHP);
                             entitiesHit++;
                         }
                     }
@@ -292,7 +292,7 @@ namespace SyndicateWarsMod.Services
                                 if (!isPlayer)
                                 {
                                     float newHP = Mathf.Max(0f, entity.m_Health.HealthValue - chainDamage);
-                                    entity.m_Health.SetHealthValue(newHP);
+                                    entity.SetHealthValue(newHP);
                                 }
                             }
                         }
@@ -353,7 +353,7 @@ namespace SyndicateWarsMod.Services
                             {
                                 float damage = zone.DamagePerSecond * deltaTime;
                                 float newHP = Mathf.Max(0f, entity.m_Health.HealthValue - damage);
-                                entity.m_Health.SetHealthValue(newHP);
+                                entity.SetHealthValue(newHP);
                             }
                         }
                     }
