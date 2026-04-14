@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Shields>
+  <!-- Syndicate Wars Dual Shield System -->
+  <!-- ID Range: 90500+ -->
+  <!-- Two shield types: Energy (regen) and Hard (no regen) -->
+
+  <!-- Energy Shield: Absorbs projectile/laser damage, regenerates after delay -->
+  <Shield>
+    <ItemID>90500</ItemID>
+    <Name>Energy Shield Mk1</Name>
+    <Type>Energy</Type>
+    <Tier>1</Tier>
+    <Cost>400</Cost>
+    <ResearchCost>250</ResearchCost>
+    <Progression>0.1</Progression>
+    <Capacity>50</Capacity>
+    <RegenRate>5</RegenRate>
+    <RegenDelay>3</RegenDelay>
+  </Shield>
+
+  <Shield>
+    <ItemID>90501</ItemID>
+    <Name>Energy Shield Mk2</Name>
+    <Type>Energy</Type>
+    <Tier>2</Tier>
+    <Cost>800</Cost>
+    <ResearchCost>500</ResearchCost>
+    <Progression>0.35</Progression>
+    <Capacity>100</Capacity>
+    <RegenRate>10</RegenRate>
+    <RegenDelay>3</RegenDelay>
+  </Shield>
+
+  <Shield>
+    <ItemID>90502</ItemID>
+    <Name>Energy Shield Mk3</Name>
+    <Type>Energy</Type>
+    <Tier>3</Tier>
+    <Cost>1200</Cost>
+    <ResearchCost>750</ResearchCost>
+    <Progression>0.6</Progression>
+    <Capacity>200</Capacity>
+    <RegenRate>20</RegenRate>
+    <RegenDelay>3</RegenDelay>
+  </Shield>
+
+  <!-- Hard Shield: Absorbs physical/explosion damage, no regeneration -->
+  <Shield>
+    <ItemID>90503</ItemID>
+    <Name>Hard Shield Mk1</Name>
+    <Type>Hard</Type>
+    <Tier>1</Tier>
+    <Cost>500</Cost>
+    <ResearchCost>300</ResearchCost>
+    <Progression>0.15</Progression>
+    <Capacity>75</Capacity>
+    <RegenRate>0</RegenRate>
+    <RegenDelay>0</RegenDelay>
+  </Shield>
+
+  <Shield>
+    <ItemID>90504</ItemID>
+    <Name>Hard Shield Mk2</Name>
+    <Type>Hard</Type>
+    <Tier>2</Tier>
+    <Cost>1000</Cost>
+    <ResearchCost>600</ResearchCost>
+    <Progression>0.4</Progression>
+    <Capacity>150</Capacity>
+    <RegenRate>0</RegenRate>
+    <RegenDelay>0</RegenDelay>
+  </Shield>
+
+  <Shield>
+    <ItemID>90505</ItemID>
+    <Name>Hard Shield Mk3</Name>
+    <Type>Hard</Type>
+    <Tier>3</Tier>
+    <Cost>1500</Cost>
+    <ResearchCost>900</ResearchCost>
+    <Progression>0.65</Progression>
+    <Capacity>300</Capacity>
+    <RegenRate>0</RegenRate>
+    <RegenDelay>0</RegenDelay>
+  </Shield>
+</Shields>

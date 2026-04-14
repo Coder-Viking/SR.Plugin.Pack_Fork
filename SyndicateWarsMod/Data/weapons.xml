@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Weapons>
+  <!-- Syndicate Wars Arsenal - New Weapons -->
+  <!-- ID Range: 90300+ (avoids PersuadatronMod's 90200 range) -->
+
+  <!-- Long Range Rifle: Extreme range sniper, charge-per-shot -->
+  <Weapon>
+    <ItemID>90300</ItemID>
+    <Name>Long Range Rifle</Name>
+    <WeaponType>3</WeaponType> <!-- SniperRifle -->
+    <Range>45</Range>
+    <ShootWhileChangeTarget>false</ShootWhileChangeTarget>
+    <DefaultAmmo>0</DefaultAmmo>
+    <ItemSlot>6</ItemSlot> <!-- Weapon -->
+    <SubCategory>3</SubCategory> <!-- SniperRifle -->
+    <Cost>2500</Cost>
+    <ResearchCost>1800</ResearchCost>
+    <Progression>0.4</Progression>
+    <StealthVsCombat>-0.3</StealthVsCombat>
+    <AmmoTypes>
+      <Ammo>
+        <Type>0</Type>
+        <DamageMin>60</DamageMin>
+        <DamageMax>100</DamageMax>
+        <DamageRadius>0</DamageRadius>
+        <KnockbackAmount>0.5</KnockbackAmount>
+        <MaxAmmo>8</MaxAmmo>
+        <ReloadTime>2.5</ReloadTime>
+        <ReloadSpeed>1</ReloadSpeed>
+        <ChargeTime>1.5</ChargeTime>
+        <ChargeEveryShot>true</ChargeEveryShot>
+        <ShieldDamage>10</ShieldDamage>
+        <CritChance>0.20</CritChance>
+        <CritDamageMultiplier>2.5</CritDamageMultiplier>
+        <AccuracyDelta>0.02</AccuracyDelta>
+        <EmpDamage>0</EmpDamage>
+        <MaxBeamWidth>0</MaxBeamWidth>
+        <ProjectilesPerShot>1</ProjectilesPerShot>
+      </Ammo>
+    </AmmoTypes>
+  </Weapon>
+
+  <!-- Razor Wire: Short-range area denial with high damage radius -->
+  <Weapon>
+    <ItemID>90301</ItemID>
+    <Name>Razor Wire</Name>
+    <WeaponType>4</WeaponType> <!-- HeavyWeapon -->
+    <Range>3</Range>
+    <ShootWhileChangeTarget>true</ShootWhileChangeTarget>
+    <DefaultAmmo>0</DefaultAmmo>
+    <ItemSlot>6</ItemSlot>
+    <SubCategory>4</SubCategory> <!-- HeavyWeapon -->
+    <Cost>600</Cost>
+    <ResearchCost>300</ResearchCost>
+    <Progression>0.15</Progression>
+    <StealthVsCombat>0.1</StealthVsCombat>
+    <AmmoTypes>
+      <Ammo>
+        <Type>0</Type>
+        <DamageMin>15</DamageMin>
+        <DamageMax>30</DamageMax>
+        <DamageRadius>2</DamageRadius>
+        <KnockbackAmount>0.2</KnockbackAmount>
+        <MaxAmmo>100</MaxAmmo>
+        <ReloadTime>0</ReloadTime>
+        <ReloadSpeed>1</ReloadSpeed>
+        <ChargeTime>0</ChargeTime>
+        <ChargeEveryShot>false</ChargeEveryShot>
+        <ShieldDamage>5</ShieldDamage>
+        <CritChance>0.05</CritChance>
+        <CritDamageMultiplier>1.5</CritDamageMultiplier>
+        <AccuracyDelta>0</AccuracyDelta>
+        <EmpDamage>0</EmpDamage>
+        <MaxBeamWidth>0</MaxBeamWidth>
+        <ProjectilesPerShot>1</ProjectilesPerShot>
+      </Ammo>
+    </AmmoTypes>
+  </Weapon>
+
+  <!-- Pulse Laser: Precise beam weapon, high shield damage -->
+  <Weapon>
+    <ItemID>90302</ItemID>
+    <Name>Pulse Laser</Name>
+    <WeaponType>2</WeaponType> <!-- AssaultRifle -->
+    <Range>28</Range>
+    <ShootWhileChangeTarget>true</ShootWhileChangeTarget>
+    <DefaultAmmo>0</DefaultAmmo>
+    <ItemSlot>6</ItemSlot>
+    <SubCategory>2</SubCategory> <!-- AssaultRifle -->
+    <Cost>1800</Cost>
+    <ResearchCost>1200</ResearchCost>
+    <Progression>0.35</Progression>
+    <StealthVsCombat>0.2</StealthVsCombat>
+    <AmmoTypes>
+      <Ammo>
+        <Type>0</Type>
+        <DamageMin>12</DamageMin>
+        <DamageMax>22</DamageMax>
+        <DamageRadius>0</DamageRadius>
+        <KnockbackAmount>0.1</KnockbackAmount>
+        <MaxAmmo>50</MaxAmmo>
+        <ReloadTime>1.5</ReloadTime>
+        <ReloadSpeed>1.2</ReloadSpeed>
+        <ChargeTime>0</ChargeTime>
+        <ChargeEveryShot>false</ChargeEveryShot>
+        <ShieldDamage>18</ShieldDamage>
+        <CritChance>0.08</CritChance>
+        <CritDamageMultiplier>1.8</CritDamageMultiplier>
+        <AccuracyDelta>0.03</AccuracyDelta>
+        <EmpDamage>0</EmpDamage>
+        <MaxBeamWidth>0.2</MaxBeamWidth>
+        <ProjectilesPerShot>1</ProjectilesPerShot>
+      </Ammo>
+    </AmmoTypes>
+  </Weapon>
+
+  <!-- Graviton Gun: Heavy AOE with massive knockback and EMP -->
+  <Weapon>
+    <ItemID>90303</ItemID>
+    <Name>Graviton Gun</Name>
+    <WeaponType>4</WeaponType> <!-- HeavyWeapon -->
+    <Range>22</Range>
+    <ShootWhileChangeTarget>false</ShootWhileChangeTarget>
+    <DefaultAmmo>0</DefaultAmmo>
+    <ItemSlot>6</ItemSlot>
+    <SubCategory>4</SubCategory> <!-- HeavyWeapon -->
+    <Cost>3500</Cost>
+    <ResearchCost>2500</ResearchCost>
+    <Progression>0.55</Progression>
+    <StealthVsCombat>0.7</StealthVsCombat>
+    <AmmoTypes>
+      <Ammo>
+        <Type>0</Type>
+        <DamageMin>20</DamageMin>
+        <DamageMax>35</DamageMax>
+        <DamageRadius>5</DamageRadius>
+        <KnockbackAmount>3.0</KnockbackAmount>
+        <MaxAmmo>10</MaxAmmo>
+        <ReloadTime>3.0</ReloadTime>
+        <ReloadSpeed>0.8</ReloadSpeed>
+        <ChargeTime>1.2</ChargeTime>
+        <ChargeEveryShot>true</ChargeEveryShot>
+        <ShieldDamage>15</ShieldDamage>
+        <CritChance>0.05</CritChance>
+        <CritDamageMultiplier>2.0</CritDamageMultiplier>
+        <AccuracyDelta>0.06</AccuracyDelta>
+        <EmpDamage>10</EmpDamage>
+        <MaxBeamWidth>0</MaxBeamWidth>
+        <ProjectilesPerShot>1</ProjectilesPerShot>
+      </Ammo>
+    </AmmoTypes>
+  </Weapon>
+
+  <!-- Satellite Rain: Orbital strike marker (registered as Gear) -->
+  <Weapon>
+    <ItemID>90304</ItemID>
+    <Name>Satellite Rain Beacon</Name>
+    <WeaponType>0</WeaponType> <!-- None (Gear item) -->
+    <Range>0</Range>
+    <ShootWhileChangeTarget>false</ShootWhileChangeTarget>
+    <DefaultAmmo>0</DefaultAmmo>
+    <ItemSlot>0</ItemSlot> <!-- Gear -->
+    <SubCategory>7</SubCategory> <!-- Gear -->
+    <Cost>5000</Cost>
+    <ResearchCost>3500</ResearchCost>
+    <Progression>0.7</Progression>
+    <StealthVsCombat>-0.5</StealthVsCombat>
+    <AmmoTypes />
+  </Weapon>
+
+  <!-- Nuclear Grenade: Massive radius, extreme damage -->
+  <Weapon>
+    <ItemID>90305</ItemID>
+    <Name>Nuclear Grenade</Name>
+    <WeaponType>5</WeaponType> <!-- Grenade -->
+    <Range>15</Range>
+    <ShootWhileChangeTarget>false</ShootWhileChangeTarget>
+    <DefaultAmmo>0</DefaultAmmo>
+    <ItemSlot>6</ItemSlot>
+    <SubCategory>5</SubCategory> <!-- Grenade -->
+    <Cost>4000</Cost>
+    <ResearchCost>3000</ResearchCost>
+    <Progression>0.65</Progression>
+    <StealthVsCombat>0.9</StealthVsCombat>
+    <AmmoTypes>
+      <Ammo>
+        <Type>0</Type>
+        <DamageMin>100</DamageMin>
+        <DamageMax>200</DamageMax>
+        <DamageRadius>15</DamageRadius>
+        <KnockbackAmount>5.0</KnockbackAmount>
+        <MaxAmmo>1</MaxAmmo>
+        <ReloadTime>5.0</ReloadTime>
+        <ReloadSpeed>0.5</ReloadSpeed>
+        <ChargeTime>2.0</ChargeTime>
+        <ChargeEveryShot>true</ChargeEveryShot>
+        <ShieldDamage>50</ShieldDamage>
+        <CritChance>0</CritChance>
+        <CritDamageMultiplier>1.0</CritDamageMultiplier>
+        <AccuracyDelta>0.1</AccuracyDelta>
+        <EmpDamage>25</EmpDamage>
+        <MaxBeamWidth>0</MaxBeamWidth>
+        <ProjectilesPerShot>1</ProjectilesPerShot>
+      </Ammo>
+    </AmmoTypes>
+  </Weapon>
+</Weapons>
