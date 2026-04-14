@@ -129,8 +129,9 @@ namespace PersuadatronMod.Services
 
         /// <summary>
         /// Attempts to persuade a target entity. Returns the PersuadedUnit if successful, null otherwise.
+        /// Uses a custom maxFollowers limit (per implant level).
         /// </summary>
-        public PersuadedUnit TryPersuade(AIEntity target, int persuadatronLevel, int currentFollowerCount)
+        public PersuadedUnit TryPersuade(AIEntity target, int persuadatronLevel, int currentFollowerCount, int maxFollowers)
         {
             if (!IsReady)
             {
@@ -139,9 +140,9 @@ namespace PersuadatronMod.Services
                 return null;
             }
 
-            if (currentFollowerCount >= config.MaxFollowers)
+            if (currentFollowerCount >= maxFollowers)
             {
-                Debug.Log("PersuadatronMod: Maximum followers reached (" + config.MaxFollowers + ")");
+                Debug.Log("PersuadatronMod: Maximum followers reached (" + maxFollowers + ")");
                 return null;
             }
 
@@ -167,16 +168,16 @@ namespace PersuadatronMod.Services
         }
 
         /// <summary>
-        /// Finds all valid persuasion targets within range of the given position.
+        /// Finds all valid persuasion targets within a custom range of the given position.
         /// </summary>
-        public List<AIEntity> FindTargetsInRange(Vector3 position, int persuadatronLevel)
+        public List<AIEntity> FindTargetsInRange(Vector3 position, int persuadatronLevel, float range)
         {
             var targets = new List<AIEntity>();
 
             try
             {
                 // Use Physics.OverlapSphere to find nearby entities
-                Collider[] colliders = Physics.OverlapSphere(position, config.PersuasionRange);
+                Collider[] colliders = Physics.OverlapSphere(position, range);
 
                 foreach (Collider collider in colliders)
                 {

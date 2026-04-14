@@ -313,23 +313,27 @@ namespace PersuadatronMod.Services
                 return;
             }
 
-            // Unarmed: look for weapon pickups
+            // Unarmed: look for weapon pickups (retry every WeaponSearchRetryInterval seconds)
             if (!unit.HasWeapon && !unit.IsPickingUpWeapon)
             {
-                GameObject weaponPickup = FindNearestWeaponPickup(unit.Transform.position);
-                if (weaponPickup != null)
+                if (Time.time >= unit.LastWeaponSearchTime + config.WeaponSearchRetryInterval)
                 {
-                    MoveToPosition(unit, weaponPickup.transform.position);
-                    unit.IsPickingUpWeapon = true;
-
-                    // Check if close enough to pick up
-                    float distToWeapon = Vector3.Distance(unit.Transform.position, weaponPickup.transform.position);
-                    if (distToWeapon < 2f)
+                    unit.LastWeaponSearchTime = Time.time;
+                    GameObject weaponPickup = FindNearestWeaponPickup(unit.Transform.position);
+                    if (weaponPickup != null)
                     {
-                        TryPickupWeapon(unit, weaponPickup);
-                        unit.IsPickingUpWeapon = false;
+                        MoveToPosition(unit, weaponPickup.transform.position);
+                        unit.IsPickingUpWeapon = true;
+
+                        // Check if close enough to pick up
+                        float distToWeapon = Vector3.Distance(unit.Transform.position, weaponPickup.transform.position);
+                        if (distToWeapon < 2f)
+                        {
+                            TryPickupWeapon(unit, weaponPickup);
+                            unit.IsPickingUpWeapon = false;
+                        }
+                        return;
                     }
-                    return;
                 }
             }
 
