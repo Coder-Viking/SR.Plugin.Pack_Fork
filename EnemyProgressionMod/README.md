@@ -78,6 +78,23 @@ Das Mod nutzt das `ISrPlugin`-Interface und greift per Reflection auf das privat
    - Das Spiel wählt dann nur Gegner aus, die in diesen Bereich fallen
 4. **Ergebnis**: Gegner richten sich nach dem Spielweltfortschritt, nicht nach Spielerausrüstung
 
+## Troubleshooting
+
+### Mod scheint nicht zu laden (F7/F8 reagieren nicht)
+
+1. **Richtiger Ordner?** Der `Mods`-Ordner muss direkt im **Satellite Reign Installationsordner** liegen, z.B.:
+   - Steam: `C:\Program Files (x86)\Steam\steamapps\common\SatelliteReign\Mods\`
+   - GOG: `C:\GOG Games\Satellite Reign\Mods\`
+   - **NICHT** in `SatelliteReignWindows_Data\` oder in einem Unterordner!
+
+2. **Richtige DLL?** Die Datei muss `EnemyProgressionMod.dll` heißen (nicht `.dll.dll` oder `.DLL`)
+
+3. **Spiel gestartet + Spielstand geladen?** Der Mod funktioniert nur **im Spiel** (nicht im Hauptmenü). Ein Spielstand muss geladen sein.
+
+4. **Beim Start sollte eine Nachricht erscheinen**: Nach dem Laden eines Spielstands zeigt der Mod automatisch eine Popup-Nachricht "Enemy Progression Mod loaded!". Wenn diese **nicht** erscheint, wird die DLL nicht geladen.
+
+5. **Andere Mods testen**: Prüfe ob andere Mods aus dem `Mods`-Ordner funktionieren (z.B. `Pause.dll`). Wenn auch diese nicht funktionieren, ist der Ordner falsch platziert.
+
 ## Kompilierung
 
 Benötigt die Satellite Reign Assembly-DLLs:

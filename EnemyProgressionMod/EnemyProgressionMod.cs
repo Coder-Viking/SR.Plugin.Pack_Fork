@@ -88,13 +88,24 @@ namespace EnemyProgressionMod
                 if (config == null)
                 {
                     LoadConfig();
+                    // Show a message so the user knows the mod is loaded
+                    try
+                    {
+                        Manager.GetUIManager().ShowMessagePopup(
+                            "Enemy Progression Mod loaded!\n" +
+                            "F7 = Status, F8 = Reload Config\n" +
+                            "Reflection ready: " + reflectionReady,
+                            5);
+                    }
+                    catch { }
                 }
+
+                // Handle hotkeys BEFORE the reflection/enabled check so
+                // F7 (status) and F8 (reload) always work, even if reflection failed
+                HandleInput();
 
                 if (!config.Enabled || !reflectionReady)
                     return;
-
-                // Handle hotkeys
-                HandleInput();
 
                 // Check periodically
                 if (Time.time < lastUpdateTime + config.UpdateIntervalSeconds)
@@ -310,6 +321,7 @@ namespace EnemyProgressionMod
                 string status =
                     "=== Enemy Progression Mod ===\n\n" +
                     "Status: " + (config.Enabled ? "ACTIVE" : "DISABLED") + "\n" +
+                    "Reflection Ready: " + (reflectionReady ? "YES" : "NO - spawn overrides will not work!") + "\n" +
                     "Current District: " + districtName + " (Index " + districtIndex + ")\n" +
                     "Enemy Level Range: " + (minProg * 100f).ToString("F0") + "% - " + (maxProg * 100f).ToString("F0") + "%\n\n" +
                     "Enemy Definitions: " + totalEnemyDefs + "\n" +
