@@ -42,6 +42,12 @@ namespace PersuadatronMod.Models
         public bool IsPickingUpWeapon { get; set; }
 
         /// <summary>
+        /// Time.time when the last weapon search was performed for this unit.
+        /// Used to throttle weapon search to every N seconds.
+        /// </summary>
+        public float LastWeaponSearchTime { get; set; }
+
+        /// <summary>
         /// Whether this unit is currently engaging an enemy.
         /// </summary>
         public bool IsInCombat { get; set; }
@@ -106,6 +112,7 @@ namespace PersuadatronMod.Models
             Duration = duration;
             HasWeapon = false;
             IsPickingUpWeapon = false;
+            LastWeaponSearchTime = 0f;
             IsInCombat = false;
             CurrentTarget = null;
             PowerLevel = 0f;

@@ -371,6 +371,9 @@ namespace PersuadatronMod.Services
                 {
                     // Create ItemData for the weapon
                     ItemManager.ItemData itemData = new ItemManager.ItemData();
+                    // CRITICAL: Initialize m_ResearchDataPoints to prevent NullReferenceException on save.
+                    // The game's SaveItemData constructor calls .ToArray() on this field.
+                    itemData.m_ResearchDataPoints = new List<ResearchDataPoint>();
                     itemData.m_ID = weapon.ItemID;
                     itemData.m_FriendlyName = weapon.Name;
                     itemData.m_Slot = GetWeaponSlotType(weapon.ItemSlot);
@@ -383,8 +386,9 @@ namespace PersuadatronMod.Services
                     itemData.m_AvailableToPlayer = true;
                     itemData.m_PlayerCanResearchFromStart = true;
                     itemData.m_AvailableFor_ALPHA_BETA_EARLYACCESS = true;
-                    itemData.m_PlayerHasPrototype = true;
-                    itemData.m_PlayerHasBlueprints = true;
+                    // Items must be researched and purchased — not available for free
+                    itemData.m_PlayerHasPrototype = false;
+                    itemData.m_PlayerHasBlueprints = false;
                     itemData.m_PrereqID = 0;
                     itemData.m_AbilityIDs = new List<int>(weapon.AbilityIDs);
                     itemData.m_AbilityMasks = new List<int>();

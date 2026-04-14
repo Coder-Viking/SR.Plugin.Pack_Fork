@@ -62,6 +62,7 @@
     <Compile Include="Services\PersuasionService.cs" />
     <Compile Include="Services\ImplantService.cs" />
     <Compile Include="Services\FollowerAIService.cs" />
+    <Compile Include="Services\EnemyDeathWatcherService.cs" />
     <Compile Include="Services\WeaponFactory.cs" />
   </ItemGroup>
   <ItemGroup>

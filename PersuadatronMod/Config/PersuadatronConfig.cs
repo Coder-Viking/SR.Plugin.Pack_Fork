@@ -23,12 +23,6 @@ namespace PersuadatronMod.Config
         public bool Enabled = true;
 
         /// <summary>
-        /// Range in world units within which the Persuadatron can affect targets.
-        /// </summary>
-        [XmlElement("PersuasionRange")]
-        public float PersuasionRange = 15f;
-
-        /// <summary>
         /// Cooldown in seconds between persuasion attempts.
         /// </summary>
         [XmlElement("PersuasionCooldown")]
@@ -41,10 +35,13 @@ namespace PersuadatronMod.Config
         public float PersuasionDuration = 0f;
 
         /// <summary>
-        /// Maximum number of simultaneously persuaded followers.
+        /// Maximum number of simultaneously persuaded followers per Neural Cortex level.
+        /// Index 0 = Mk1, Index 1 = Mk2, Index 2 = Mk3.
+        /// If the implant level exceeds the list length, the last value is used.
         /// </summary>
-        [XmlElement("MaxFollowers")]
-        public int MaxFollowers = 8;
+        [XmlArray("MaxFollowersPerLevel")]
+        [XmlArrayItem("Level")]
+        public List<int> MaxFollowersPerLevel = new List<int> { 2, 5, 8 };
 
         /// <summary>
         /// PowerLevel threshold for Mk1 Persuadatron (civilians only). Not used for target filtering
@@ -64,6 +61,13 @@ namespace PersuadatronMod.Config
         /// </summary>
         [XmlElement("Mk3PowerLevelMax")]
         public float Mk3PowerLevelMax = 0.75f;
+
+        /// <summary>
+        /// Range in world units around the Persuadatron carrier within which the
+        /// persuasion aura automatically affects valid targets.
+        /// </summary>
+        [XmlElement("PersuasionAuraRange")]
+        public float PersuasionAuraRange = 10f;
         #endregion
 
         #region Follower AI Settings
@@ -96,6 +100,25 @@ namespace PersuadatronMod.Config
         /// </summary>
         [XmlElement("FollowerUpdateInterval")]
         public float FollowerUpdateInterval = 0.5f;
+
+        /// <summary>
+        /// How often (in seconds) unarmed followers retry searching for a weapon on the ground.
+        /// </summary>
+        [XmlElement("WeaponSearchRetryInterval")]
+        public float WeaponSearchRetryInterval = 3f;
+
+        /// <summary>
+        /// Range in world units within which the mod scans for recently killed enemies
+        /// to drop weapons.
+        /// </summary>
+        [XmlElement("EnemyDeathScanRange")]
+        public float EnemyDeathScanRange = 40f;
+
+        /// <summary>
+        /// How often (in seconds) the mod scans for dead enemies to spawn weapon drops.
+        /// </summary>
+        [XmlElement("EnemyDeathScanInterval")]
+        public float EnemyDeathScanInterval = 1f;
         #endregion
 
         #region Implant Settings
