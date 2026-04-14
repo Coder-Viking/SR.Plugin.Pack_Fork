@@ -67,7 +67,7 @@ namespace PersuadatronMod.Services
                 // Check each player agent for equipped brain implant
                 foreach (AgentAI agent in AgentAI.GetAgents())
                 {
-                    if (agent == null)
+                    if (agent == null || agent.m_Items == null)
                         continue;
 
                     // Check if agent has any of our brain implant items equipped
@@ -76,7 +76,7 @@ namespace PersuadatronMod.Services
                         if (implant.SlotType != 1) // 1 = Head
                             continue;
 
-                        if (IsItemEquipped(agent, implant.ItemID))
+                        if (agent.m_Items.HasEquipped(implant.ItemID))
                         {
                             return implant.PersuadatronLevel;
                         }
@@ -425,55 +425,17 @@ namespace PersuadatronMod.Services
         }
 
         /// <summary>
-        /// Checks whether a specific item is equipped on an agent.
-        /// </summary>
-        private bool IsItemEquipped(AgentAI agent, int itemID)
-        {
-            try
-            {
-                // Access agent's equipped items via reflection
-                var equippedField = typeof(AgentAI).GetField("m_EquippedItems",
-                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-
-                if (equippedField == null)
-                {
-                    equippedField = typeof(AgentAI).GetField("m_Equipment",
-                        BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                }
-
-                if (equippedField != null)
-                {
-                    var equipped = equippedField.GetValue(agent);
-                    if (equipped is int[])
-                    {
-                        foreach (int id in (int[])equipped)
-                        {
-                            if (id == itemID)
-                                return true;
-                        }
-                    }
-                    else if (equipped is List<int>)
-                    {
-                        return ((List<int>)equipped).Contains(itemID);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogError("PersuadatronMod: Error checking equipped item: " + e.Message);
-            }
-            return false;
-        }
-
-        /// <summary>
         /// Gets the tier of the equipped implant for a specific slot type on an agent.
         /// Returns 0 if no implant of that type is equipped.
         /// </summary>
         private int GetEquippedImplantTier(AgentAI agent, int slotType)
         {
+            if (agent == null || agent.m_Items == null)
+                return 0;
+
             foreach (var implant in implantDefinitions)
             {
-                if (implant.SlotType == slotType && IsItemEquipped(agent, implant.ItemID))
+                if (implant.SlotType == slotType && agent.m_Items.HasEquipped(implant.ItemID))
                 {
                     return implant.Tier;
                 }
