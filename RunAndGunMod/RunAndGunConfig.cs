@@ -14,8 +14,9 @@ namespace RunAndGunMod
     public class RunAndGunConfig
     {
         /// <summary>
-        /// Multiplier applied to all weapon damage values (m_damage_min, m_damage_max, m_shield_damage).
-        /// Default 2.0 = double damage. Affects ALL weapons globally (player and enemy).
+        /// Multiplier applied to player agent weapon damage via WeaponDamageMultiplier modifier.
+        /// Default 2.0 = double damage. Only affects YOUR agents, NOT enemies.
+        /// Works the same way as the Soldier's Rage ability damage boost.
         /// </summary>
         [XmlElement("DamageMultiplier")]
         public float DamageMultiplier = 2.0f;
