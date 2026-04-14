@@ -14,8 +14,7 @@ namespace PersuadatronMod
     /// Features:
     ///   1. Persuadatron - Portable item that converts NPCs to followers (brain implant level-gated)
     ///   2. 4 Implant Groups - Legs/Arms/Body/Head with 3 tiers each
-    ///   3. Syndicate Wars Weapons - Uzi, Minigun, Pumpgun, Railgun, Flamethrower, Gauss Gun, Laser
-    ///   4. Follower AI - Persuaded units follow, fight, and pick up weapons
+    ///   3. Follower AI - Persuaded units follow, fight, and pick up weapons
     /// 
     /// Hotkeys:
     ///   P     - Activate Persuadatron on nearest valid target
@@ -32,7 +31,6 @@ namespace PersuadatronMod
 
         // Services
         private ImplantService implantService;
-        private WeaponFactory weaponFactory;
         private PersuasionService persuasionService;
         private FollowerAIService followerAIService;
 
@@ -122,13 +120,11 @@ namespace PersuadatronMod
 
                 // Initialize services in dependency order
                 implantService = new ImplantService(config);
-                weaponFactory = new WeaponFactory(config);
                 persuasionService = new PersuasionService(config, implantService);
                 followerAIService = new FollowerAIService(config);
 
                 // Register items with the game
                 implantService.RegisterImplants();
-                weaponFactory.RegisterWeapons();
                 RegisterPersuadatronItems();
 
                 servicesRegistered = true;
@@ -141,8 +137,7 @@ namespace PersuadatronMod
                     "  F5 - Show status\n" +
                     "  F6 - Reload config\n" +
                     "  L - List followers\n\n" +
-                    "Equip a Brain Implant to unlock Persuadatron levels.\n" +
-                    "Syndicate Wars weapons are now available for research!", 10);
+                    "Equip a Brain Implant to unlock Persuadatron levels.", 10);
 
                 Debug.Log("PersuadatronMod: All services initialized and items registered");
             }
@@ -512,8 +507,7 @@ namespace PersuadatronMod
                     "Valid Targets: " + targetInfo + "\n" +
                     "Followers: " + followerAIService.FollowerCount + "/" + config.MaxFollowers + "\n" +
                     "Range: " + config.PersuasionRange + " units\n\n" +
-                    "Implants Registered: " + implantService.GetImplantDefinitions().Count + "\n" +
-                    "Weapons Registered: " + weaponFactory.GetWeaponDefinitions().Count + "\n\n" +
+                    "Implants Registered: " + implantService.GetImplantDefinitions().Count + "\n\n" +
                     "Hotkeys: P=Persuade, F5=Status, F6=Reload, L=List Followers";
 
                 Manager.GetUIManager().ShowMessagePopup(status, 15);
