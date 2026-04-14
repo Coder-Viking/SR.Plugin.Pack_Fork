@@ -291,8 +291,9 @@ namespace PersuadatronMod.Services
                     itemData.m_AvailableToPlayer = true;
                     itemData.m_PlayerCanResearchFromStart = true;
                     itemData.m_AvailableFor_ALPHA_BETA_EARLYACCESS = true;
-                    itemData.m_PlayerHasPrototype = true;
-                    itemData.m_PlayerHasBlueprints = true;
+                    // Items must be researched and purchased — not available for free
+                    itemData.m_PlayerHasPrototype = false;
+                    itemData.m_PlayerHasBlueprints = false;
                     itemData.m_PrereqID = implant.Tier > 1
                         ? implant.ItemID - 1 // Previous tier is prerequisite
                         : 0;

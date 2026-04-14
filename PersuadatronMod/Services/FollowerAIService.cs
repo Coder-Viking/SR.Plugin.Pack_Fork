@@ -10,14 +10,14 @@ namespace PersuadatronMod.Services
     /// <summary>
     /// AI controller for persuaded units.
     /// 
-    /// Behavior priority:
-    ///   1. Follow the Persuadatron carrier
-    ///   2. If has weapon → auto-fire at enemies in range
-    ///   3. If no weapon, weapon on ground nearby → pick it up
-    ///   4. If no weapon and none nearby → do nothing (passive follow)
+    /// Uses the game's built-in Hijack system to make persuaded units behave
+    /// like hijacked soldiers. They follow the player naturally using the game's
+    /// pathfinding, fight enemies automatically, and pick up weapons.
     /// 
-    /// Persuaded units follow the carrier of the Persuadatron and engage
-    /// hostile entities automatically. They pick up dropped weapons if unarmed.
+    /// The Hijack system handles:
+    ///   - Natural pathfinding-based following (no teleportation)
+    ///   - Combat engagement (units fight instead of fleeing)
+    ///   - Proper integration with the game's AI state machine
     /// </summary>
     public class FollowerAIService
     {
@@ -25,7 +25,7 @@ namespace PersuadatronMod.Services
         private readonly List<PersuadedUnit> followers;
         private float lastUpdateTime;
 
-        // Cached reflection fields
+        // Cached reflection fields for fallback behavior
         private FieldInfo entityMovementField;
         private MethodInfo moveToMethod;
         private MethodInfo attackMethod;
@@ -45,7 +45,7 @@ namespace PersuadatronMod.Services
         {
             try
             {
-                // Cache reflection for entity movement commands
+                // Cache reflection for entity movement commands (fallback)
                 entityMovementField = typeof(AIEntity).GetField("m_Movement",
                     BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -98,26 +98,128 @@ namespace PersuadatronMod.Services
 
         /// <summary>
         /// Adds a newly persuaded unit to the follower list.
+        /// Uses the game's Hijack system to make the unit behave like a hijacked soldier,
+        /// enabling natural following, combat participation, and weapon usage.
         /// </summary>
         public void AddFollower(PersuadedUnit unit)
         {
             if (unit != null && !followers.Contains(unit))
             {
                 followers.Add(unit);
-                Debug.Log("PersuadatronMod: Added follower. Total: " + followers.Count);
+                HijackUnit(unit);
+                Debug.Log("PersuadatronMod: Added follower (hijacked). Total: " + followers.Count);
             }
         }
 
         /// <summary>
-        /// Removes a specific follower.
+        /// Removes a specific follower and releases hijack control.
         /// </summary>
         public void RemoveFollower(PersuadedUnit unit)
         {
+            if (unit != null)
+            {
+                UnhijackUnit(unit);
+            }
             followers.Remove(unit);
         }
 
         /// <summary>
+        /// Hijacks a persuaded unit using the game's built-in Hijack system.
+        /// This makes the unit behave like a hijacked soldier:
+        /// - Follows the player agent naturally via game pathfinding
+        /// - Fights enemies instead of fleeing
+        /// - Uses equipped weapons in combat
+        /// </summary>
+        private void HijackUnit(PersuadedUnit unit)
+        {
+            try
+            {
+                if (unit == null || unit.Entity == null)
+                    return;
+
+                AIEntity entity = unit.Entity;
+
+                // Use the game's Hijack method, same as SyndicateMod's ToggleControlOfUnits
+                entity.m_IsIgnoringInput = false;
+                entity.m_IsControllable = true;
+                entity.Hijack(AgentAI.GetAgent(AgentAI.AgentClass.Soldier), true);
+
+                // Visual feedback: magenta xray color for persuaded units
+                try
+                {
+                    entity.m_Wardrobe.SetXrayColor(Color.cyan);
+                    entity.UpdateXrayColor();
+                }
+                catch
+                {
+                    // Visual feedback is optional, ignore errors
+                }
+
+                // Check if the entity already has a weapon equipped
+                try
+                {
+                    var items = entity.GetItems();
+                    if (items != null)
+                    {
+                        // Check weapon slots for any equipped weapon
+                        var weaponItem = items.GetEquippedItem(ItemSlotTypes.Weapon, 0);
+                        var pistolItem = items.GetEquippedItem(ItemSlotTypes.WeaponPistol, 0);
+                        if (weaponItem != null || pistolItem != null)
+                        {
+                            unit.HasWeapon = true;
+                        }
+                    }
+                }
+                catch
+                {
+                    // Weapon check is optional
+                }
+
+                Debug.Log("PersuadatronMod: Hijacked unit for persuasion control");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("PersuadatronMod: HijackUnit failed: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Releases hijack control of a persuaded unit.
+        /// </summary>
+        private void UnhijackUnit(PersuadedUnit unit)
+        {
+            try
+            {
+                if (unit == null || unit.Entity == null)
+                    return;
+
+                AIEntity entity = unit.Entity;
+                entity.m_IsControllable = false;
+                entity.Unhijack();
+
+                // Reset xray color
+                try
+                {
+                    entity.m_Wardrobe.SetXrayColor(Color.blue);
+                    entity.UpdateXrayColor();
+                }
+                catch
+                {
+                    // Visual feedback is optional
+                }
+
+                Debug.Log("PersuadatronMod: Released hijack control of unit");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("PersuadatronMod: UnhijackUnit failed: " + e.Message);
+            }
+        }
+
+        /// <summary>
         /// Main update loop for follower AI. Call from the mod's Update() method.
+        /// With the Hijack system active, the game handles most AI behavior.
+        /// This update loop handles cleanup, weapon pickup, and leash distance.
         /// </summary>
         public void UpdateFollowers(Vector3 carrierPosition)
         {
@@ -126,10 +228,10 @@ namespace PersuadatronMod.Services
 
             lastUpdateTime = Time.time;
 
-            // Clean up dead/expired followers
+            // Clean up dead/expired followers (unhijacks them)
             CleanupFollowers();
 
-            // Update each follower's behavior
+            // Update each follower's supplementary behavior
             for (int i = 0; i < followers.Count; i++)
             {
                 try
@@ -144,7 +246,7 @@ namespace PersuadatronMod.Services
         }
 
         /// <summary>
-        /// Removes dead or expired followers from the list.
+        /// Removes dead or expired followers from the list, releasing hijack control.
         /// </summary>
         private void CleanupFollowers()
         {
@@ -152,6 +254,7 @@ namespace PersuadatronMod.Services
             {
                 if (followers[i].ShouldRemove)
                 {
+                    UnhijackUnit(followers[i]);
                     Debug.Log("PersuadatronMod: Removing follower (dead/expired). Remaining: " + (followers.Count - 1));
                     followers.RemoveAt(i);
                 }
@@ -159,8 +262,12 @@ namespace PersuadatronMod.Services
         }
 
         /// <summary>
-        /// Updates behavior for a single follower unit.
-        /// Priority: Follow → Combat (if armed) → Pickup weapon → Idle follow
+        /// Updates supplementary behavior for a single follower unit.
+        /// The Hijack system handles core movement and combat.
+        /// This method handles:
+        ///   - Leash distance (move to carrier if too far)
+        ///   - Weapon pickup for unarmed followers
+        ///   - Combat state tracking
         /// </summary>
         private void UpdateFollowerBehavior(PersuadedUnit unit, Vector3 carrierPosition)
         {
@@ -169,7 +276,7 @@ namespace PersuadatronMod.Services
 
             float distanceToCarrier = Vector3.Distance(unit.Transform.position, carrierPosition);
 
-            // Priority 1: If too far, move to carrier
+            // If too far from carrier, command the hijacked unit to move back
             if (distanceToCarrier > config.SprintCatchUpDistance)
             {
                 MoveToPosition(unit, carrierPosition);
@@ -177,25 +284,36 @@ namespace PersuadatronMod.Services
                 return;
             }
 
-            // Priority 2: If has weapon, look for enemies
+            // Update weapon status from entity's actual equipment
+            UpdateWeaponStatus(unit);
+
+            // If armed, let the hijack AI handle combat
+            // Just update our tracking state based on whether enemies are nearby
             if (unit.HasWeapon)
             {
                 AIEntity enemy = FindNearestEnemy(unit.Transform.position);
                 if (enemy != null)
                 {
+                    // Ensure the hijacked unit is attacking the nearest enemy
                     AttackTarget(unit, enemy);
                     unit.IsInCombat = true;
                     unit.CurrentTarget = enemy;
-                    return;
                 }
                 else
                 {
                     unit.IsInCombat = false;
                     unit.CurrentTarget = null;
+
+                    // No enemies and far from carrier - follow
+                    if (distanceToCarrier > config.FollowDistance)
+                    {
+                        MoveToPosition(unit, carrierPosition);
+                    }
                 }
+                return;
             }
 
-            // Priority 3: No weapon, look for weapon on ground
+            // Unarmed: look for weapon pickups
             if (!unit.HasWeapon && !unit.IsPickingUpWeapon)
             {
                 GameObject weaponPickup = FindNearestWeaponPickup(unit.Transform.position);
@@ -215,12 +333,31 @@ namespace PersuadatronMod.Services
                 }
             }
 
-            // Priority 4: Follow carrier (maintain formation distance)
+            // Unarmed, no weapons nearby: follow carrier
             if (distanceToCarrier > config.FollowDistance)
             {
-                // Calculate position behind the carrier
-                Vector3 followPos = carrierPosition;
-                MoveToPosition(unit, followPos);
+                MoveToPosition(unit, carrierPosition);
+            }
+        }
+
+        /// <summary>
+        /// Updates the weapon status of a follower based on actual equipped items.
+        /// </summary>
+        private void UpdateWeaponStatus(PersuadedUnit unit)
+        {
+            try
+            {
+                var items = unit.Entity.GetItems();
+                if (items != null)
+                {
+                    var weaponItem = items.GetEquippedItem(ItemSlotTypes.Weapon, 0);
+                    var pistolItem = items.GetEquippedItem(ItemSlotTypes.WeaponPistol, 0);
+                    unit.HasWeapon = (weaponItem != null || pistolItem != null);
+                }
+            }
+            catch
+            {
+                // Weapon check is optional
             }
         }
 
@@ -240,14 +377,6 @@ namespace PersuadatronMod.Services
                         moveToMethod.Invoke(movement, new object[] { position });
                         return;
                     }
-                }
-
-                // Fallback: direct transform movement (basic, no pathfinding)
-                if (unit.Transform != null)
-                {
-                    Vector3 direction = (position - unit.Transform.position).normalized;
-                    float speed = 5f; // Base movement speed
-                    unit.Transform.position += direction * speed * config.FollowerUpdateInterval;
                 }
             }
             catch (Exception e)

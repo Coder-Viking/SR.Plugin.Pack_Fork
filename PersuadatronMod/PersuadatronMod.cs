@@ -186,6 +186,9 @@ namespace PersuadatronMod
             string description, float cost, float researchCost, float progression, int prereqID)
         {
             ItemManager.ItemData itemData = new ItemManager.ItemData();
+            // CRITICAL: Initialize m_ResearchDataPoints to prevent NullReferenceException on save.
+            // The game's SaveItemData constructor calls .ToArray() on this field.
+            itemData.m_ResearchDataPoints = new List<ResearchDataPoint>();
             itemData.m_ID = id;
             itemData.m_FriendlyName = name;
             itemData.m_Slot = ItemSlotTypes.Gear;
@@ -198,8 +201,9 @@ namespace PersuadatronMod
             itemData.m_AvailableToPlayer = true;
             itemData.m_PlayerCanResearchFromStart = true;
             itemData.m_AvailableFor_ALPHA_BETA_EARLYACCESS = true;
-            itemData.m_PlayerHasPrototype = true;
-            itemData.m_PlayerHasBlueprints = true;
+            // Items must be researched and purchased — not available for free
+            itemData.m_PlayerHasPrototype = false;
+            itemData.m_PlayerHasBlueprints = false;
             itemData.m_AbilityIDs = new List<int>();
             itemData.m_AbilityMasks = new List<int>();
             itemData.m_Modifiers = new ModifierData5L[0];
