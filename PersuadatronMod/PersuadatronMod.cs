@@ -464,14 +464,13 @@ namespace PersuadatronMod
 
             try
             {
+                // Clean up dead/expired followers once per update cycle
+                followerAIService.CleanupExpiredFollowers();
+
                 // Update followers per-agent: each follower follows its owner agent
                 foreach (AgentAI agent in AgentAI.GetAgents())
                 {
                     if (agent == null)
-                        continue;
-
-                    var agentFollowers = followerAIService.GetFollowersForAgent(agent);
-                    if (agentFollowers.Count == 0)
                         continue;
 
                     followerAIService.UpdateFollowersForAgent(agent, agent.transform.position);
