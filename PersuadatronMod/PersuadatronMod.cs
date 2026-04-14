@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using PersuadatronMod.Config;
 using PersuadatronMod.Models;
 using PersuadatronMod.Services;
@@ -202,63 +203,90 @@ namespace PersuadatronMod
             itemData.m_AvailableToPlayer = true;
             itemData.m_PlayerCanResearchFromStart = true;
             itemData.m_AvailableFor_ALPHA_BETA_EARLYACCESS = true;
+            itemData.m_PlayerHasPrototype = true;
+            itemData.m_PlayerHasBlueprints = true;
             itemData.m_AbilityIDs = new List<int>();
             itemData.m_AbilityMasks = new List<int>();
             itemData.m_Modifiers = new ModifierData5L[0];
             itemData.m_StealthVsCombat = -0.5f; // Stealthy device
 
-            // Use the same registration pattern as ImplantService
             RegisterItemWithManager(itemManager, itemData);
+            RegisterItemLocalization(id, name, description);
         }
 
         private void RegisterItemWithManager(ItemManager itemManager, ItemManager.ItemData itemData)
         {
             try
             {
-                var itemListField = typeof(ItemManager).GetField("m_ItemData",
-                    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic |
-                    System.Reflection.BindingFlags.Instance);
-
-                if (itemListField == null)
+                // Check for duplicates before adding
+                bool exists = false;
+                foreach (var existing in itemManager.m_ItemDefinitions)
                 {
-                    itemListField = typeof(ItemManager).GetField("m_Items",
-                        System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic |
-                        System.Reflection.BindingFlags.Instance);
+                    if (existing.m_ID == itemData.m_ID)
+                    {
+                        exists = true;
+                        break;
+                    }
                 }
-
-                if (itemListField != null)
+                if (!exists)
                 {
-                    var itemList = itemListField.GetValue(itemManager);
-                    if (itemList is List<ItemManager.ItemData>)
-                    {
-                        var list = (List<ItemManager.ItemData>)itemList;
-                        bool exists = false;
-                        foreach (var existing in list)
-                        {
-                            if (existing.m_ID == itemData.m_ID)
-                            {
-                                exists = true;
-                                break;
-                            }
-                        }
-                        if (!exists)
-                        {
-                            list.Add(itemData);
-                        }
-                    }
-                    else if (itemList is ItemManager.ItemData[])
-                    {
-                        var array = (ItemManager.ItemData[])itemList;
-                        var newArray = new ItemManager.ItemData[array.Length + 1];
-                        Array.Copy(array, newArray, array.Length);
-                        newArray[array.Length] = itemData;
-                        itemListField.SetValue(itemManager, newArray);
-                    }
+                    itemManager.m_ItemDefinitions.Add(itemData);
                 }
             }
             catch (Exception e)
             {
                 Debug.LogError("PersuadatronMod: RegisterItem failed: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Registers localization entries for an item so it displays properly in the UI.
+        /// </summary>
+        private void RegisterItemLocalization(int itemID, string name, string description)
+        {
+            try
+            {
+                var textManager = TextManager.Get();
+                if (textManager == null)
+                    return;
+
+                var langLookupField = typeof(TextManager).GetField("m_FastLanguageLookup",
+                    BindingFlags.NonPublic | BindingFlags.Instance);
+                if (langLookupField == null)
+                    return;
+
+                var langLookup = langLookupField.GetValue(textManager) as Dictionary<string, TextManager.LocElement>;
+                if (langLookup == null)
+                    return;
+
+                // Register item name
+                string nameKey = "ITEM_" + itemID + "_NAME";
+                if (!langLookup.ContainsKey(nameKey))
+                {
+                    var nameElement = new TextManager.LocElement();
+                    nameElement.m_token = nameKey;
+                    nameElement.m_Translations = new string[8];
+                    nameElement.m_Translations[2] = name; // English
+                    langLookup[nameKey] = nameElement;
+                }
+
+                // Register item description
+                if (!string.IsNullOrEmpty(description))
+                {
+                    string descKey = "ITEM_" + itemID + "_DESCRIPTION";
+                    if (!langLookup.ContainsKey(descKey))
+                    {
+                        var descElement = new TextManager.LocElement();
+                        descElement.m_token = descKey;
+                        descElement.m_Translations = new string[8];
+                        descElement.m_Translations[2] = description; // English
+                        langLookup[descKey] = descElement;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("PersuadatronMod: RegisterItemLocalization failed for ID " + itemID + ": " + e.Message);
             }
         }
         #endregion

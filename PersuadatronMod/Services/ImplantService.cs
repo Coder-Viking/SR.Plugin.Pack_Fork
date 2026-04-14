@@ -28,9 +28,6 @@ namespace PersuadatronMod.Services
         private List<ImplantDefinition> implantDefinitions;
         private bool isRegistered;
 
-        // Cached reflection for ItemManager access
-        private FieldInfo itemListField;
-
         public ImplantService(PersuadatronConfig config)
         {
             this.config = config;
@@ -291,6 +288,8 @@ namespace PersuadatronMod.Services
                     itemData.m_AvailableToPlayer = true;
                     itemData.m_PlayerCanResearchFromStart = true;
                     itemData.m_AvailableFor_ALPHA_BETA_EARLYACCESS = true;
+                    itemData.m_PlayerHasPrototype = true;
+                    itemData.m_PlayerHasBlueprints = true;
                     itemData.m_PrereqID = implant.Tier > 1
                         ? implant.ItemID - 1 // Previous tier is prerequisite
                         : 0;
@@ -312,8 +311,12 @@ namespace PersuadatronMod.Services
                     }
                     itemData.m_Modifiers = modifiers.ToArray();
 
-                    // Register with ItemManager
+                    // Register with ItemManager using the correct field
                     RegisterItem(itemManager, itemData);
+
+                    // Register localization
+                    RegisterItemLocalization(implant.ItemID, implant.Name,
+                        "Tier " + implant.Tier + " augmentation implant.");
 
                     Debug.Log("PersuadatronMod: Registered implant: " + implant.Name +
                         " (ID: " + implant.ItemID + ", Slot: " + implant.SlotType + ")");
@@ -327,65 +330,82 @@ namespace PersuadatronMod.Services
         }
 
         /// <summary>
-        /// Registers a single item with the ItemManager using reflection to access internal lists.
+        /// Registers a single item with the ItemManager using the public m_ItemDefinitions list.
         /// </summary>
         private void RegisterItem(ItemManager itemManager, ItemManager.ItemData itemData)
         {
             try
             {
-                // Try to access the item list via reflection
-                if (itemListField == null)
+                // Check for duplicates before adding
+                bool exists = false;
+                foreach (var existing in itemManager.m_ItemDefinitions)
                 {
-                    itemListField = typeof(ItemManager).GetField("m_ItemData",
-                        BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-
-                    if (itemListField == null)
+                    if (existing.m_ID == itemData.m_ID)
                     {
-                        // Try alternative field names
-                        itemListField = typeof(ItemManager).GetField("m_Items",
-                            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                        exists = true;
+                        break;
                     }
                 }
-
-                if (itemListField != null)
+                if (!exists)
                 {
-                    var itemList = itemListField.GetValue(itemManager);
-                    if (itemList is List<ItemManager.ItemData>)
-                    {
-                        var list = (List<ItemManager.ItemData>)itemList;
-                        // Don't add duplicates
-                        bool exists = false;
-                        foreach (var existing in list)
-                        {
-                            if (existing.m_ID == itemData.m_ID)
-                            {
-                                exists = true;
-                                break;
-                            }
-                        }
-                        if (!exists)
-                        {
-                            list.Add(itemData);
-                        }
-                    }
-                    else if (itemList is ItemManager.ItemData[])
-                    {
-                        var array = (ItemManager.ItemData[])itemList;
-                        var newArray = new ItemManager.ItemData[array.Length + 1];
-                        Array.Copy(array, newArray, array.Length);
-                        newArray[array.Length] = itemData;
-                        itemListField.SetValue(itemManager, newArray);
-                    }
-                }
-                else
-                {
-                    Debug.LogWarning("PersuadatronMod: Could not find item data field in ItemManager");
+                    itemManager.m_ItemDefinitions.Add(itemData);
                 }
             }
             catch (Exception e)
             {
                 Debug.LogError("PersuadatronMod: RegisterItem failed for ID " +
                     itemData.m_ID + ": " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Registers localization entries for an item so it displays properly in the UI.
+        /// </summary>
+        private void RegisterItemLocalization(int itemID, string name, string description)
+        {
+            try
+            {
+                var textManager = TextManager.Get();
+                if (textManager == null)
+                    return;
+
+                var langLookupField = typeof(TextManager).GetField("m_FastLanguageLookup",
+                    BindingFlags.NonPublic | BindingFlags.Instance);
+                if (langLookupField == null)
+                    return;
+
+                var langLookup = langLookupField.GetValue(textManager) as Dictionary<string, TextManager.LocElement>;
+                if (langLookup == null)
+                    return;
+
+                // Register item name
+                string nameKey = "ITEM_" + itemID + "_NAME";
+                if (!langLookup.ContainsKey(nameKey))
+                {
+                    var nameElement = new TextManager.LocElement();
+                    nameElement.m_token = nameKey;
+                    nameElement.m_Translations = new string[8];
+                    nameElement.m_Translations[2] = name;
+                    langLookup[nameKey] = nameElement;
+                }
+
+                // Register item description
+                if (!string.IsNullOrEmpty(description))
+                {
+                    string descKey = "ITEM_" + itemID + "_DESCRIPTION";
+                    if (!langLookup.ContainsKey(descKey))
+                    {
+                        var descElement = new TextManager.LocElement();
+                        descElement.m_token = descKey;
+                        descElement.m_Translations = new string[8];
+                        descElement.m_Translations[2] = description;
+                        langLookup[descKey] = descElement;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("PersuadatronMod: RegisterItemLocalization failed for ID " + itemID + ": " + e.Message);
             }
         }
 
