@@ -293,8 +293,5 @@ namespace SyndicateWarsMod.Services
             }
         }
 
-        // Delegate types for .NET 3.5 compatibility
-        private delegate void Action<T1, T2>(T1 arg1, T2 arg2);
-        private delegate TResult Func<T, TResult>(T arg);
     }
 }
