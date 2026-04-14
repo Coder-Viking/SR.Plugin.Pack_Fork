@@ -327,7 +327,7 @@ namespace PersuadatronMod.Services
                         continue;
 
                     // Check if alive
-                    var health = entity.GetHealth();
+                    var health = entity.m_Health;
                     if (health == null || health.HealthValue <= 0f)
                         continue;
 

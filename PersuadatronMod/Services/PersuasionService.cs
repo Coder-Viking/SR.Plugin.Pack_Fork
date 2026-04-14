@@ -95,7 +95,7 @@ namespace PersuadatronMod.Services
                     return false;
 
                 // Check if entity is alive
-                var health = entity.GetHealth();
+                var health = entity.m_Health;
                 if (health == null || health.HealthValue <= 0f)
                     return false;
 
@@ -211,7 +211,7 @@ namespace PersuadatronMod.Services
         {
             try
             {
-                var health = entity.GetHealth();
+                var health = entity.m_Health;
                 if (health == null)
                     return 1f; // Assume maximum if unknown
 
