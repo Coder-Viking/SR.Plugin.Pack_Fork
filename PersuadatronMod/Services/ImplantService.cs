@@ -67,7 +67,7 @@ namespace PersuadatronMod.Services
                 // Check each player agent for equipped brain implant
                 foreach (AgentAI agent in AgentAI.GetAgents())
                 {
-                    if (agent == null || agent.m_Items == null)
+                    if (agent == null || agent.GetItems() == null)
                         continue;
 
                     // Check if agent has any of our brain implant items equipped
@@ -76,7 +76,7 @@ namespace PersuadatronMod.Services
                         if (implant.SlotType != 1) // 1 = Head
                             continue;
 
-                        if (agent.m_Items.HasEquipped(implant.ItemID))
+                        if (agent.GetItems().HasEquipped(implant.ItemID))
                         {
                             return implant.PersuadatronLevel;
                         }
@@ -430,12 +430,12 @@ namespace PersuadatronMod.Services
         /// </summary>
         private int GetEquippedImplantTier(AgentAI agent, int slotType)
         {
-            if (agent == null || agent.m_Items == null)
+            if (agent == null || agent.GetItems() == null)
                 return 0;
 
             foreach (var implant in implantDefinitions)
             {
-                if (implant.SlotType == slotType && agent.m_Items.HasEquipped(implant.ItemID))
+                if (implant.SlotType == slotType && agent.GetItems().HasEquipped(implant.ItemID))
                 {
                     return implant.Tier;
                 }
