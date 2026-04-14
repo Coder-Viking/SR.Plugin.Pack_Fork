@@ -22,6 +22,13 @@ namespace SyndicateWarsMod.Services
         private readonly SyndicateWarsConfig config;
         private bool isRegistered;
 
+        // WeaponType integer values matching the game's enum
+        // (named members don't exist in Assembly-CSharp.dll, so we use int casts)
+        private const int WeaponTypeAssaultRifle = 2;
+        private const int WeaponTypeSniperRifle = 3;
+        private const int WeaponTypeHeavyWeapon = 4;
+        private const int WeaponTypeGrenade = 5;
+
         // Cached reflection for ItemManager access
         private FieldInfo itemListField;
 
@@ -57,22 +64,22 @@ namespace SyndicateWarsMod.Services
 
                 // 1. Long Range Rifle (Sniper)
                 RegisterWeaponItem(itemManager, nextID++, "Long Range Rifle",
-                    ItemSlotTypes.Weapon, (WeaponType)3,
+                    ItemSlotTypes.Weapon, (WeaponType)WeaponTypeSniperRifle,
                     2500f, 1800f, 0.4f, -0.3f);
 
                 // 2. Razor Wire (Area denial)
                 RegisterWeaponItem(itemManager, nextID++, "Razor Wire",
-                    ItemSlotTypes.Weapon, (WeaponType)4,
+                    ItemSlotTypes.Weapon, (WeaponType)WeaponTypeHeavyWeapon,
                     600f, 300f, 0.15f, 0.1f);
 
                 // 3. Pulse Laser (Precise beam)
                 RegisterWeaponItem(itemManager, nextID++, "Pulse Laser",
-                    ItemSlotTypes.Weapon, (WeaponType)2,
+                    ItemSlotTypes.Weapon, (WeaponType)WeaponTypeAssaultRifle,
                     1800f, 1200f, 0.35f, 0.2f);
 
                 // 4. Graviton Gun (Heavy AOE + knockback)
                 RegisterWeaponItem(itemManager, nextID++, "Graviton Gun",
-                    ItemSlotTypes.Weapon, (WeaponType)4,
+                    ItemSlotTypes.Weapon, (WeaponType)WeaponTypeHeavyWeapon,
                     3500f, 2500f, 0.55f, 0.7f);
 
                 // 5. Satellite Rain (Orbital strike marker - Gear item)
@@ -81,7 +88,7 @@ namespace SyndicateWarsMod.Services
 
                 // 6. Nuclear Grenade
                 RegisterWeaponItem(itemManager, nextID++, "Nuclear Grenade",
-                    ItemSlotTypes.Weapon, (WeaponType)5,
+                    ItemSlotTypes.Weapon, (WeaponType)WeaponTypeGrenade,
                     4000f, 3000f, 0.65f, 0.9f);
 
                 isRegistered = true;
