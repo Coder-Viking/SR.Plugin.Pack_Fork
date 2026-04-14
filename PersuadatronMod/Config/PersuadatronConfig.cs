@@ -36,7 +36,8 @@ namespace PersuadatronMod.Config
 
         /// <summary>
         /// Maximum number of simultaneously persuaded followers per Neural Cortex level.
-        /// Index 0 = Mk1 (civilians), Index 1 = Mk2, Index 2 = Mk3.
+        /// Index 0 = Mk1, Index 1 = Mk2, Index 2 = Mk3.
+        /// If the implant level exceeds the list length, the last value is used.
         /// </summary>
         [XmlArray("MaxFollowersPerLevel")]
         [XmlArrayItem("Level")]

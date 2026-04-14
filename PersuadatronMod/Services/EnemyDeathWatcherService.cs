@@ -27,18 +27,14 @@ namespace PersuadatronMod.Services
         private Type itemPickupType;
         private bool reflectionReady;
 
-        // Weapon IDs from game's built-in arsenal, mapped by tier
-        // These are common weapon IDs found in the game's ItemDefinitions
-        private readonly int[] tierWeaponIDs;
+        // Weapon IDs from game's built-in arsenal, resolved dynamically at runtime
+        // via GetWeaponIDForEntity()
 
         public EnemyDeathWatcherService(PersuadatronConfig config)
         {
             this.config = config;
             this.lastScanTime = 0f;
             this.processedDeaths = new HashSet<int>();
-
-            // Default weapon IDs — will be resolved from actual game items at runtime
-            this.tierWeaponIDs = new int[0];
 
             InitializeReflection();
         }
@@ -245,6 +241,7 @@ namespace PersuadatronMod.Services
                 }
 
                 // Select weapon tier based on enemy HP
+                // Fall through to lower tiers if no weapons of the preferred tier exist
                 if (maxHealth >= 300f && heavyIDs.Count > 0)
                 {
                     // High-level enemy: drop a heavy/sniper weapon
@@ -257,13 +254,8 @@ namespace PersuadatronMod.Services
                 }
                 else if (pistolIDs.Count > 0)
                 {
-                    // Low-level enemy: drop a pistol
+                    // Low-level enemy or fallback: drop a pistol
                     return pistolIDs[UnityEngine.Random.Range(0, pistolIDs.Count)];
-                }
-                else if (rifleIDs.Count > 0)
-                {
-                    // Fallback to any rifle
-                    return rifleIDs[UnityEngine.Random.Range(0, rifleIDs.Count)];
                 }
             }
             catch (Exception e)
