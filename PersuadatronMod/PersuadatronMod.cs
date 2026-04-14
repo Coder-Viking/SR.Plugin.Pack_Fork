@@ -183,9 +183,9 @@ namespace PersuadatronMod
                 itemData.m_AvailableToPlayer = true;
                 itemData.m_PlayerCanResearchFromStart = true;
                 itemData.m_AvailableFor_ALPHA_BETA_EARLYACCESS = true;
-                // Must be researched and purchased
-                itemData.m_PlayerHasPrototype = false;
-                itemData.m_PlayerHasBlueprints = false;
+                // Available from game start — no research needed (only Mk1 exists)
+                itemData.m_PlayerHasPrototype = true;
+                itemData.m_PlayerHasBlueprints = true;
                 itemData.m_AbilityIDs = new List<int>();
                 itemData.m_AbilityMasks = new List<int>();
                 itemData.m_Modifiers = new ModifierData5L[0];
