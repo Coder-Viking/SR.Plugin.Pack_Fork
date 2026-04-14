@@ -39,7 +39,7 @@ namespace PersuadatronMod.Services
         {
             try
             {
-                entityFactionField = typeof(GameEntity).GetField("m_Faction",
+                entityFactionField = typeof(AIEntity).GetField("m_Faction",
                     BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                 reflectionReady = entityFactionField != null;
             }
@@ -83,7 +83,7 @@ namespace PersuadatronMod.Services
         /// Checks whether a given entity is a valid persuasion target based on
         /// the current brain implant level and target properties.
         /// </summary>
-        public bool IsValidTarget(GameEntity entity, int persuadatronLevel)
+        public bool IsValidTarget(AIEntity entity, int persuadatronLevel)
         {
             if (entity == null)
                 return false;
@@ -130,7 +130,7 @@ namespace PersuadatronMod.Services
         /// <summary>
         /// Attempts to persuade a target entity. Returns the PersuadedUnit if successful, null otherwise.
         /// </summary>
-        public PersuadedUnit TryPersuade(GameEntity target, int persuadatronLevel, int currentFollowerCount)
+        public PersuadedUnit TryPersuade(AIEntity target, int persuadatronLevel, int currentFollowerCount)
         {
             if (!IsReady)
             {
@@ -169,9 +169,9 @@ namespace PersuadatronMod.Services
         /// <summary>
         /// Finds all valid persuasion targets within range of the given position.
         /// </summary>
-        public List<GameEntity> FindTargetsInRange(Vector3 position, int persuadatronLevel)
+        public List<AIEntity> FindTargetsInRange(Vector3 position, int persuadatronLevel)
         {
-            var targets = new List<GameEntity>();
+            var targets = new List<AIEntity>();
 
             try
             {
@@ -183,9 +183,9 @@ namespace PersuadatronMod.Services
                     if (collider == null)
                         continue;
 
-                    GameEntity entity = collider.GetComponent<GameEntity>();
+                    AIEntity entity = collider.GetComponent<AIEntity>();
                     if (entity == null)
-                        entity = collider.GetComponentInParent<GameEntity>();
+                        entity = collider.GetComponentInParent<AIEntity>();
 
                     if (entity != null && IsValidTarget(entity, persuadatronLevel))
                     {
@@ -207,7 +207,7 @@ namespace PersuadatronMod.Services
         /// <summary>
         /// Estimates the power level of an entity based on its health relative to baseline.
         /// </summary>
-        private float EstimatePowerLevel(GameEntity entity)
+        private float EstimatePowerLevel(AIEntity entity)
         {
             try
             {
@@ -235,7 +235,7 @@ namespace PersuadatronMod.Services
         /// <summary>
         /// Checks if an entity is a civilian (low power, non-combatant).
         /// </summary>
-        private bool IsCivilian(GameEntity entity)
+        private bool IsCivilian(AIEntity entity)
         {
             try
             {
@@ -264,7 +264,7 @@ namespace PersuadatronMod.Services
         /// <summary>
         /// Checks if an entity is a player-controlled agent.
         /// </summary>
-        private bool IsPlayerAgent(GameEntity entity)
+        private bool IsPlayerAgent(AIEntity entity)
         {
             try
             {

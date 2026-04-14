@@ -29,6 +29,7 @@ namespace PersuadatronMod.Services
         private FieldInfo entityMovementField;
         private MethodInfo moveToMethod;
         private MethodInfo attackMethod;
+        private Type itemPickupType;
         private bool reflectionReady;
 
         public FollowerAIService(PersuadatronConfig config)
@@ -45,11 +46,11 @@ namespace PersuadatronMod.Services
             try
             {
                 // Cache reflection for entity movement commands
-                entityMovementField = typeof(GameEntity).GetField("m_Movement",
+                entityMovementField = typeof(AIEntity).GetField("m_Movement",
                     BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
                 // Try to find MoveTo method
-                var movementType = typeof(GameEntity).Assembly.GetType("EntityMovement");
+                var movementType = typeof(AIEntity).Assembly.GetType("EntityMovement");
                 if (movementType != null)
                 {
                     moveToMethod = movementType.GetMethod("MoveTo",
@@ -57,14 +58,17 @@ namespace PersuadatronMod.Services
                 }
 
                 // Try to find attack method
-                attackMethod = typeof(GameEntity).GetMethod("ServerSetAttackTarget",
+                attackMethod = typeof(AIEntity).GetMethod("ServerSetAttackTarget",
                     BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
                 if (attackMethod == null)
                 {
-                    attackMethod = typeof(GameEntity).GetMethod("SetAttackTarget",
+                    attackMethod = typeof(AIEntity).GetMethod("SetAttackTarget",
                         BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                 }
+
+                // Try to find ItemPickup type at runtime
+                itemPickupType = typeof(AIEntity).Assembly.GetType("ItemPickup");
 
                 reflectionReady = true;
                 Debug.Log("PersuadatronMod: FollowerAI reflection initialized");
@@ -176,7 +180,7 @@ namespace PersuadatronMod.Services
             // Priority 2: If has weapon, look for enemies
             if (unit.HasWeapon)
             {
-                GameEntity enemy = FindNearestEnemy(unit.Transform.position);
+                AIEntity enemy = FindNearestEnemy(unit.Transform.position);
                 if (enemy != null)
                 {
                     AttackTarget(unit, enemy);
@@ -255,7 +259,7 @@ namespace PersuadatronMod.Services
         /// <summary>
         /// Commands a follower to attack an enemy entity.
         /// </summary>
-        private void AttackTarget(PersuadedUnit unit, GameEntity enemy)
+        private void AttackTarget(PersuadedUnit unit, AIEntity enemy)
         {
             try
             {
@@ -268,7 +272,7 @@ namespace PersuadatronMod.Services
                 // Fallback: try to set target via available methods
                 try
                 {
-                    var setTarget = typeof(GameEntity).GetMethod("SetTarget",
+                    var setTarget = typeof(AIEntity).GetMethod("SetTarget",
                         BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                     if (setTarget != null)
                     {
@@ -294,12 +298,12 @@ namespace PersuadatronMod.Services
         /// Finds the nearest enemy entity to the given position.
         /// Enemies are determined by faction opposition to the player.
         /// </summary>
-        private GameEntity FindNearestEnemy(Vector3 position)
+        private AIEntity FindNearestEnemy(Vector3 position)
         {
             try
             {
                 Collider[] colliders = Physics.OverlapSphere(position, config.FollowerCombatRange);
-                GameEntity nearest = null;
+                AIEntity nearest = null;
                 float nearestDistance = float.MaxValue;
 
                 foreach (Collider collider in colliders)
@@ -307,9 +311,9 @@ namespace PersuadatronMod.Services
                     if (collider == null)
                         continue;
 
-                    GameEntity entity = collider.GetComponent<GameEntity>();
+                    AIEntity entity = collider.GetComponent<AIEntity>();
                     if (entity == null)
-                        entity = collider.GetComponentInParent<GameEntity>();
+                        entity = collider.GetComponentInParent<AIEntity>();
 
                     if (entity == null)
                         continue;
@@ -351,6 +355,9 @@ namespace PersuadatronMod.Services
         {
             try
             {
+                if (itemPickupType == null)
+                    return null;
+
                 Collider[] colliders = Physics.OverlapSphere(position, config.WeaponPickupRange);
                 GameObject nearest = null;
                 float nearestDistance = float.MaxValue;
@@ -360,10 +367,10 @@ namespace PersuadatronMod.Services
                     if (collider == null || collider.gameObject == null)
                         continue;
 
-                    // Look for ItemPickup components
-                    var pickup = collider.GetComponent<ItemPickup>();
+                    // Look for ItemPickup components via runtime type
+                    var pickup = collider.GetComponent(itemPickupType);
                     if (pickup == null)
-                        pickup = collider.GetComponentInParent<ItemPickup>();
+                        pickup = collider.GetComponentInParent(itemPickupType);
 
                     if (pickup == null)
                         continue;
@@ -396,14 +403,17 @@ namespace PersuadatronMod.Services
         {
             try
             {
-                var pickup = weaponObject.GetComponent<ItemPickup>();
+                if (itemPickupType == null)
+                    return;
+
+                var pickup = weaponObject.GetComponent(itemPickupType);
                 if (pickup == null)
-                    pickup = weaponObject.GetComponentInParent<ItemPickup>();
+                    pickup = weaponObject.GetComponentInParent(itemPickupType);
 
                 if (pickup != null)
                 {
                     // Try to invoke pickup via reflection
-                    var pickupMethod = typeof(ItemPickup).GetMethod("PickUp",
+                    var pickupMethod = itemPickupType.GetMethod("PickUp",
                         BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
                     if (pickupMethod != null)
@@ -423,16 +433,19 @@ namespace PersuadatronMod.Services
         /// <summary>
         /// Checks if a pickup is a weapon item.
         /// </summary>
-        private bool IsWeaponPickup(ItemPickup pickup)
+        private bool IsWeaponPickup(Component pickup)
         {
             try
             {
-                var itemField = typeof(ItemPickup).GetField("m_ItemID",
+                if (itemPickupType == null)
+                    return false;
+
+                var itemField = itemPickupType.GetField("m_ItemID",
                     BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
                 if (itemField == null)
                 {
-                    itemField = typeof(ItemPickup).GetField("m_Item",
+                    itemField = itemPickupType.GetField("m_Item",
                         BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                 }
 
@@ -461,7 +474,7 @@ namespace PersuadatronMod.Services
         /// <summary>
         /// Checks if an entity is a player agent or one of our followers.
         /// </summary>
-        private bool IsPlayerOrFollower(GameEntity entity)
+        private bool IsPlayerOrFollower(AIEntity entity)
         {
             // Check player agents
             try
@@ -490,12 +503,12 @@ namespace PersuadatronMod.Services
         /// <summary>
         /// Determines if an entity is hostile to the player.
         /// </summary>
-        private bool IsHostile(GameEntity entity)
+        private bool IsHostile(AIEntity entity)
         {
             try
             {
                 // Check entity's faction via reflection
-                var factionField = typeof(GameEntity).GetField("m_Faction",
+                var factionField = typeof(AIEntity).GetField("m_Faction",
                     BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
                 if (factionField != null)

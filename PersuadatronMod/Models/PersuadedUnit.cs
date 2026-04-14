@@ -11,7 +11,7 @@ namespace PersuadatronMod.Models
         /// <summary>
         /// The game entity representing this persuaded unit.
         /// </summary>
-        public GameEntity Entity { get; set; }
+        public AIEntity Entity { get; set; }
 
         /// <summary>
         /// The transform of the persuaded unit for position tracking.
@@ -49,7 +49,7 @@ namespace PersuadatronMod.Models
         /// <summary>
         /// The current enemy target this unit is engaging.
         /// </summary>
-        public GameEntity CurrentTarget { get; set; }
+        public AIEntity CurrentTarget { get; set; }
 
         /// <summary>
         /// Estimated power level of this unit (cached from spawn data or HP estimation).
@@ -99,7 +99,7 @@ namespace PersuadatronMod.Models
             get { return !IsAlive || HasExpired; }
         }
 
-        public PersuadedUnit(GameEntity entity, float duration)
+        public PersuadedUnit(AIEntity entity, float duration)
         {
             Entity = entity;
             PersuadedAtTime = Time.time;
