@@ -291,8 +291,11 @@ namespace PersuadatronMod.Services
                     itemData.m_AvailableToPlayer = true;
                     itemData.m_PlayerCanResearchFromStart = true;
                     itemData.m_AvailableFor_ALPHA_BETA_EARLYACCESS = true;
-                    // Items must be researched and purchased — not available for free
-                    itemData.m_PlayerHasPrototype = false;
+                    // Neural Cortex Mk1: prototype available from start, must be researched to unlock.
+                    // Neural Cortex Mk2/Mk3: prototype must be found as mission drop (m_Progression controls district).
+                    // Other implants: must be researched and purchased.
+                    bool isBrainMk1 = implant.SlotType == 1 && implant.Tier == 1;
+                    itemData.m_PlayerHasPrototype = isBrainMk1;
                     itemData.m_PlayerHasBlueprints = false;
                     itemData.m_PrereqID = implant.Tier > 1
                         ? implant.ItemID - 1 // Previous tier is prerequisite
