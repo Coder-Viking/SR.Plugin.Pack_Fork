@@ -193,7 +193,7 @@ namespace PersuadatronMod
             itemData.m_ID = id;
             itemData.m_FriendlyName = name;
             itemData.m_Slot = ItemSlotTypes.Gear;
-            itemData.m_GearSubCategory = ItemSubCategories.Gear;
+            itemData.m_GearSubCategory = ItemSubCategories.Standard;
             itemData.m_WeaponType = WeaponType.None;
             itemData.m_Cost = cost;
             itemData.m_ResearchCost = researchCost;

@@ -68,7 +68,7 @@ namespace PersuadatronMod.Models
 
                 try
                 {
-                    var health = Entity.GetHealth();
+                    var health = Entity.m_Health;
                     return health != null && health.HealthValue > 0f;
                 }
                 catch

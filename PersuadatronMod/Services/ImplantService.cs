@@ -124,7 +124,7 @@ namespace PersuadatronMod.Services
                     if (currentHealth < maxHealth && currentHealth > 0f)
                     {
                         float newHealth = Mathf.Min(currentHealth + regenPerSecond * deltaTime, maxHealth);
-                        agent.m_Health.SetHealthValue(newHealth);
+                        agent.SetHealthValue(newHealth);
                     }
                 }
             }
@@ -283,7 +283,7 @@ namespace PersuadatronMod.Services
                     itemData.m_ID = implant.ItemID;
                     itemData.m_FriendlyName = implant.Name;
                     itemData.m_Slot = GetSlotType(implant.SlotType);
-                    itemData.m_GearSubCategory = ItemSubCategories.Augmentation;
+                    itemData.m_GearSubCategory = ItemSubCategories.Standard;
                     itemData.m_WeaponType = WeaponType.None;
                     itemData.m_Cost = implant.Cost;
                     itemData.m_ResearchCost = implant.ResearchCost;
@@ -306,7 +306,7 @@ namespace PersuadatronMod.Services
                         {
                             m_Type = (ModifierType)mod.Type,
                             m_Ammount = mod.Amount,
-                            m_AmountModifier = ModifierType.None,
+                            m_AmountModifier = ModifierType.NONE,
                             m_TimeOut = mod.TimeOut
                         });
                     }
